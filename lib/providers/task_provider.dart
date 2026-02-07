@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:mdm/apis/mdm/task.dart';
+import 'package:mdm/constants/styles.dart';
 import 'package:mdm/models/vo/task.pb.dart' hide DownloadStats;
 import '../models/task.dart';
 import '../services/download_service.dart';
@@ -19,9 +20,8 @@ class TaskProvider extends ChangeNotifier {
   StreamSubscription? _streamSubscription;
 
   TaskProvider({DownloadService? service})
-      : _service = service ?? DownloadService();
+    : _service = service ?? DownloadService();
 
-  // Getters
   List<Task> get tasks => _filteredTasks;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -35,44 +35,51 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get _filteredTasks {
     var filtered = _tasks;
 
-    // 按状态过滤
     switch (_currentFilter) {
       case FilterType.downloading:
-        filtered = filtered.where((t) =>
-        t.phase == TaskPhase.TpDownRunning ||
-            t.phase == TaskPhase.TpDownWaiting
-        ).toList();
+        filtered = filtered
+            .where(
+              (t) =>
+                  t.phase == TaskPhase.TpDownRunning ||
+                  t.phase == TaskPhase.TpDownWaiting,
+            )
+            .toList();
         break;
       case FilterType.completed:
-        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownCompleted).toList();
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpDownCompleted)
+            .toList();
         break;
       case FilterType.paused:
-        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownPaused).toList();
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpDownPaused)
+            .toList();
         break;
       case FilterType.failed:
-        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownFailed).toList();
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpDownFailed)
+            .toList();
         break;
       case FilterType.all:
         break;
     }
 
-    // 搜索过滤
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((t) =>
-          t.name.toLowerCase().contains(_searchQuery.toLowerCase())
-      ).toList();
+      filtered = filtered
+          .where(
+            (t) => t.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
+          .toList();
     }
 
     return filtered;
   }
 
-  /// 初始化并获取任务列表
   Future<void> initialize() async {
     await fetchTasks();
     _startRealtimeUpdates();
   }
 
-  /// 获取任务列表
   Future<void> fetchTasks() async {
     _isLoading = true;
     _error = null;
@@ -89,22 +96,24 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 开始实时更新
   void _startRealtimeUpdates() {
     _streamSubscription?.cancel();
-    _streamSubscription = Stream.periodic(const Duration(seconds: 5), (_) async => await listTasks()).listen(
+    _streamSubscription =
+        Stream.periodic(
+          const Duration(seconds: AppStyles.refreshIntervalSeconds),
+          (_) async => await listTasks(),
+        ).listen(
           (tasks) async {
-        _tasks = await tasks;
-        notifyListeners();
-      },
-      onError: (e) {
-        _error = e.toString();
-        notifyListeners();
-      },
-    );
+            _tasks = await tasks;
+            notifyListeners();
+          },
+          onError: (e) {
+            _error = e.toString();
+            notifyListeners();
+          },
+        );
   }
 
-  /// 添加新任务
   Future<void> addTask(String url, {String? fileName, String? category}) async {
     try {
       final task = await _service.addTask(
@@ -120,7 +129,6 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 暂停任务
   Future<void> pauseTask(String taskId) async {
     try {
       await _service.pauseTask(taskId);
@@ -130,7 +138,6 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 继续任务
   Future<void> resumeTask(String taskId) async {
     try {
       await _service.resumeTask(taskId);
@@ -140,7 +147,6 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 删除任务
   Future<void> deleteTask(String taskId, {bool deleteFile = false}) async {
     try {
       await _service.deleteTask(taskId, deleteFile: deleteFile);
@@ -153,7 +159,6 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 重试任务
   Future<void> retryTask(String taskId) async {
     try {
       await _service.retryTask(taskId);
@@ -163,19 +168,15 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// 批量暂停
   Future<void> pauseSelected() async {
     await _service.batchOperation(
       taskIds: _selectedTaskIds.toList(),
       operation: 'pause',
     );
-    for (var id in _selectedTaskIds) {
-    }
     _selectedTaskIds.clear();
     notifyListeners();
   }
 
-  /// 批量删除
   Future<void> deleteSelected({bool deleteFile = false}) async {
     await _service.batchOperation(
       taskIds: _selectedTaskIds.toList(),
@@ -186,19 +187,16 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 设置过滤器
   void setFilter(FilterType filter) {
     _currentFilter = filter;
     notifyListeners();
   }
 
-  /// 设置搜索关键词
   void setSearchQuery(String query) {
     _searchQuery = query;
     notifyListeners();
   }
 
-  /// 选择/取消选择任务
   void toggleSelection(String taskId) {
     if (_selectedTaskIds.contains(taskId)) {
       _selectedTaskIds.remove(taskId);
@@ -208,7 +206,6 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 全选/取消全选
   void toggleSelectAll() {
     if (_selectedTaskIds.length == _filteredTasks.length) {
       _selectedTaskIds.clear();
@@ -218,7 +215,6 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 清除选择
   void clearSelection() {
     _selectedTaskIds.clear();
     notifyListeners();

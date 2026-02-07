@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/utils/string.dart';
+import 'package:mdm/constants/colors.dart';
+import 'package:mdm/constants/styles.dart';
+import 'package:mdm/constants/strings.dart';
+import 'package:mdm/providers/task_provider.dart';
+import 'package:mdm/utils/color_helper.dart';
+import 'package:mdm/utils/format_helper.dart';
+import 'package:mdm/utils/icon_helper.dart';
+import 'package:mdm/widgets/common/app_progress_indicator.dart';
 import 'package:provider/provider.dart';
-import '../providers/task_provider.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({super.key});
@@ -9,31 +15,22 @@ class OverviewPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A1A2E),
-            const Color(0xFF16213E),
-          ],
-        ),
-      ),
+      decoration: BoxDecoration(gradient: ColorHelper.getSurfaceGradient()),
       child: Column(
         children: [
           _buildHeader(),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppStyles.paddingXLarge),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSpeedCard(context),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppStyles.spacingXLarge),
                   _buildStatsGrid(context),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppStyles.spacingXLarge),
                   _buildStorageCard(context),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppStyles.spacingXLarge),
                   _buildFilterSection(context),
                 ],
               ),
@@ -46,47 +43,45 @@ class OverviewPanel extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppStyles.paddingXXLarge),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppStyles.paddingMedium),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-              ),
-              borderRadius: BorderRadius.circular(16),
+              gradient: ColorHelper.getPrimaryGradient(),
+              borderRadius: BorderRadius.circular(AppStyles.borderRadiusLarge),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF667EEA).withOpacity(0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                  color: AppColors.primary.withValues(alpha: 0.4),
+                  blurRadius: AppStyles.blurRadiusMedium,
+                  offset: const Offset(0, AppStyles.shadowOffsetMedium),
                 ),
               ],
             ),
             child: const Icon(
               Icons.download_rounded,
-              color: Colors.white,
-              size: 28,
+              color: AppColors.white,
+              size: AppStyles.iconSizeXLarge,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppStyles.spacingLarge),
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Download',
+                AppStrings.download,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+                  color: AppColors.white,
+                  fontSize: AppStyles.fontSizeXXLarge,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                'Manager',
+                AppStrings.manager,
                 style: TextStyle(
-                  color: Colors.white54,
-                  fontSize: 14,
+                  color: AppColors.white54,
+                  fontSize: AppStyles.fontSizeMedium,
                 ),
               ),
             ],
@@ -101,19 +96,15 @@ class OverviewPanel extends StatelessWidget {
       builder: (context, provider, _) {
         final stats = provider.stats;
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-            ),
-            borderRadius: BorderRadius.circular(20),
+            gradient: ColorHelper.getPrimaryGradient(),
+            borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF667EEA).withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: AppStyles.blurRadiusMedium,
+                offset: const Offset(0, AppStyles.shadowOffsetLarge),
               ),
             ],
           ),
@@ -124,16 +115,19 @@ class OverviewPanel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Download Speed',
+                    AppStrings.downloadSpeed,
                     style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
+                      color: AppColors.white70,
+                      fontSize: AppStyles.fontSizeMedium,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: AppColors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -143,17 +137,19 @@ class OverviewPanel extends StatelessWidget {
                           height: 8,
                           decoration: BoxDecoration(
                             color: stats.downloading > 0
-                                ? const Color(0xFF00FF88)
-                                : Colors.white54,
+                                ? AppColors.success
+                                : AppColors.white54,
                             shape: BoxShape.circle,
                           ),
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          stats.downloading > 0 ? 'Active' : 'Idle',
+                          stats.downloading > 0
+                              ? AppStrings.active
+                              : AppStrings.idle,
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+                            color: AppColors.white,
+                            fontSize: AppStyles.fontSizeSmall,
                           ),
                         ),
                       ],
@@ -161,31 +157,31 @@ class OverviewPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spacingLarge),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    formatSize(stats.totalSpeed),
+                    FormatHelper.formatSpeed(stats.totalSpeed.toDouble()),
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
+                      color: AppColors.white,
+                      fontSize: AppStyles.fontSizeXXXLarge,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Padding(
                     padding: EdgeInsets.only(bottom: 6, left: 4),
                     child: Text(
-                      '/s',
+                      AppStrings.perSecond,
                       style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
+                        color: AppColors.white70,
+                        fontSize: AppStyles.fontSizeLarge,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spacingLarge),
               _buildSpeedIndicator(stats.totalSpeed.toDouble()),
             ],
           ),
@@ -195,35 +191,16 @@ class OverviewPanel extends StatelessWidget {
   }
 
   Widget _buildSpeedIndicator(double speed) {
-    final maxSpeed = 10 * 1024 * 1024; // 10 MB/s as max
+    final maxSpeed = AppStyles.maxSpeed;
     final progress = (speed / maxSpeed).clamp(0.0, 1.0);
 
-    return Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Colors.white.withOpacity(0.2),
-            valueColor: const AlwaysStoppedAnimation(Colors.white),
-            minHeight: 6,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              '0 MB/s',
-              style: TextStyle(color: Colors.white54, fontSize: 10),
-            ),
-            const Text(
-              '10 MB/s',
-              style: TextStyle(color: Colors.white54, fontSize: 10),
-            ),
-          ],
-        ),
-      ],
+    return AppProgressIndicator(
+      value: progress,
+      backgroundColor: AppColors.white.withValues(alpha: 0.2),
+      valueColor: AppColors.white,
+      height: AppStyles.progressHeightSmall,
+      showLabel: true,
+      label: '${AppStrings.zeroMB} - ${AppStrings.tenMB}',
     );
   }
 
@@ -235,53 +212,53 @@ class OverviewPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Statistics',
+              AppStrings.statistics,
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+                color: AppColors.white,
+                fontSize: AppStyles.fontSizeLarge,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppStyles.paddingMedium),
             Row(
               children: [
                 Expanded(
                   child: _buildStatItem(
                     icon: Icons.download_rounded,
-                    label: 'Downloading',
+                    label: AppStrings.downloading,
                     value: '${stats.downloading}',
-                    color: const Color(0xFF4ECDC4),
+                    color: AppColors.info,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppStyles.paddingMedium),
                 Expanded(
                   child: _buildStatItem(
                     icon: Icons.check_circle_rounded,
-                    label: 'Completed',
+                    label: AppStrings.completed,
                     value: '${stats.completed}',
-                    color: const Color(0xFF00FF88),
+                    color: AppColors.success,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppStyles.paddingMedium),
             Row(
               children: [
                 Expanded(
                   child: _buildStatItem(
                     icon: Icons.pause_circle_rounded,
-                    label: 'Paused',
+                    label: AppStrings.paused,
                     value: '${stats.paused}',
-                    color: const Color(0xFFFFBE0B),
+                    color: AppColors.warning,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppStyles.paddingMedium),
                 Expanded(
                   child: _buildStatItem(
                     icon: Icons.error_rounded,
-                    label: 'Failed',
+                    label: AppStrings.failed,
                     value: '${stats.failed}',
-                    color: const Color(0xFFFF6B6B),
+                    color: AppColors.error,
                   ),
                 ),
               ],
@@ -299,22 +276,22 @@ class OverviewPanel extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppStyles.paddingLarge),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppStyles.borderRadiusLarge),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
+          Icon(icon, color: color, size: AppStyles.iconSizeLarge),
           const SizedBox(height: 12),
           Text(
             value,
             style: TextStyle(
               color: color,
-              fontSize: 24,
+              fontSize: AppStyles.fontSizeXXLarge,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -322,8 +299,8 @@ class OverviewPanel extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 12,
+              color: AppColors.white60,
+              fontSize: AppStyles.fontSizeSmall,
             ),
           ),
         ],
@@ -340,11 +317,11 @@ class OverviewPanel extends StatelessWidget {
             : 0.0;
 
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            color: AppColors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
+            border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,49 +330,46 @@ class OverviewPanel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Total Progress',
+                    AppStrings.totalProgress,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                      color: AppColors.white,
+                      fontSize: AppStyles.fontSizeMedium,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     '${(progress * 100).toStringAsFixed(1)}%',
                     style: const TextStyle(
-                      color: Color(0xFF4ECDC4),
-                      fontSize: 14,
+                      color: AppColors.info,
+                      fontSize: AppStyles.fontSizeMedium,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: Colors.white.withOpacity(0.1),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFF4ECDC4)),
-                  minHeight: 10,
-                ),
+              const SizedBox(height: AppStyles.paddingLarge),
+              AppProgressIndicator(
+                value: progress,
+                backgroundColor: AppColors.white.withValues(alpha: 0.1),
+                valueColor: AppColors.info,
+                height: AppStyles.progressHeightLarge,
               ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    formatSize(stats.totalDownloaded),
+                    FormatHelper.formatSize(stats.totalDownloaded),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
+                      color: AppColors.white60,
+                      fontSize: AppStyles.fontSizeSmall,
                     ),
                   ),
                   Text(
-                    formatSize(stats.totalSize),
+                    FormatHelper.formatSize(stats.totalSize),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
+                      color: AppColors.white60,
+                      fontSize: AppStyles.fontSizeSmall,
                     ),
                   ),
                 ],
@@ -414,16 +388,16 @@ class OverviewPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Quick Filter',
+              AppStrings.quickFilter,
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+                color: AppColors.white,
+                fontSize: AppStyles.fontSizeLarge,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 12),
-            ...FilterType.values.map((filter) =>
-                _buildFilterItem(context, filter, provider)
+            const SizedBox(height: AppStyles.paddingMedium),
+            ...FilterType.values.map(
+              (filter) => _buildFilterItem(context, filter, provider),
             ),
           ],
         );
@@ -432,73 +406,46 @@ class OverviewPanel extends StatelessWidget {
   }
 
   Widget _buildFilterItem(
-      BuildContext context,
-      FilterType filter,
-      TaskProvider provider,
-      ) {
+    BuildContext context,
+    FilterType filter,
+    TaskProvider provider,
+  ) {
     final isSelected = provider.currentFilter == filter;
-    final IconData icon;
-    final String label;
-    final Color color;
-
-    switch (filter) {
-      case FilterType.all:
-        icon = Icons.list_rounded;
-        label = 'All Tasks';
-        color = Colors.white;
-        break;
-      case FilterType.downloading:
-        icon = Icons.download_rounded;
-        label = 'Downloading';
-        color = const Color(0xFF4ECDC4);
-        break;
-      case FilterType.completed:
-        icon = Icons.check_circle_rounded;
-        label = 'Completed';
-        color = const Color(0xFF00FF88);
-        break;
-      case FilterType.paused:
-        icon = Icons.pause_circle_rounded;
-        label = 'Paused';
-        color = const Color(0xFFFFBE0B);
-        break;
-      case FilterType.failed:
-        icon = Icons.error_rounded;
-        label = 'Failed';
-        color = const Color(0xFFFF6B6B);
-        break;
-    }
+    final icon = IconHelper.getFilterIcon(filter);
+    final label = IconHelper.getFilterLabel(filter);
+    final color = IconHelper.getFilterColor(filter);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppStyles.spacingSmall),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () => provider.setFilter(filter),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            duration: AppStyles.animationDurationMedium,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppStyles.paddingLarge,
+              vertical: AppStyles.paddingMedium,
+            ),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? color.withOpacity(0.15)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
+              color: isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
               border: Border.all(
-                color: isSelected
-                    ? color.withOpacity(0.3)
-                    : Colors.transparent,
+                color: isSelected ? color.withValues(alpha: 0.3) : Colors.transparent,
               ),
             ),
             child: Row(
               children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 12),
+                Icon(icon, color: color, size: AppStyles.iconSizeMedium),
+                const SizedBox(width: AppStyles.paddingMedium),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? color : Colors.white70,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? color : AppColors.white70,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                   ),
                 ),
                 const Spacer(),
@@ -506,7 +453,7 @@ class OverviewPanel extends StatelessWidget {
                   Icon(
                     Icons.chevron_right_rounded,
                     color: color,
-                    size: 20,
+                    size: AppStyles.iconSizeMedium,
                   ),
               ],
             ),

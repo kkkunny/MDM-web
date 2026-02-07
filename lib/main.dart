@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'providers/task_provider.dart';
-import 'pages/task_list_page.dart';
+import 'package:mdm/providers/task_provider.dart';
+import 'package:mdm/pages/task_list_page.dart';
+import 'package:mdm/theme/app_theme.dart';
 
 void main() => runApp(const MyApp());
 
@@ -15,11 +16,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Download Manager',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          brightness: Brightness.dark,
-          fontFamily: 'Inter',
-        ),
+        theme: AppTheme.darkTheme,
         home: const TaskListPage(),
       ),
     );
