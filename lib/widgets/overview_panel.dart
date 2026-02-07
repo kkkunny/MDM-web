@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mdm/utils/string.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
-import '../models/download_task.dart';
 
 class OverviewPanel extends StatelessWidget {
   const OverviewPanel({super.key});
@@ -166,7 +166,7 @@ class OverviewPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    _formatSpeed(stats.totalSpeed),
+                    formatSize(stats.totalSpeed),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -186,7 +186,7 @@ class OverviewPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildSpeedIndicator(stats.totalSpeed),
+              _buildSpeedIndicator(stats.totalSpeed.toDouble()),
             ],
           ),
         );
@@ -385,14 +385,14 @@ class OverviewPanel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _formatSize(stats.totalDownloaded),
+                    formatSize(stats.totalDownloaded),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
                   Text(
-                    _formatSize(stats.totalSize),
+                    formatSize(stats.totalSize),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 12,
@@ -514,27 +514,5 @@ class OverviewPanel extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatSpeed(double bytesPerSecond) {
-    if (bytesPerSecond < 1024) {
-      return '${bytesPerSecond.toStringAsFixed(0)} B';
-    } else if (bytesPerSecond < 1024 * 1024) {
-      return '${(bytesPerSecond / 1024).toStringAsFixed(1)} KB';
-    } else {
-      return '${(bytesPerSecond / (1024 * 1024)).toStringAsFixed(2)} MB';
-    }
-  }
-
-  String _formatSize(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    } else if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    } else if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    } else {
-      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
-    }
   }
 }

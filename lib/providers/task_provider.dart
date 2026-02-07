@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import '../models/download_task.dart';
+import 'package:mdm/apis/mdm/task.dart';
+import 'package:mdm/models/vo/task.pb.dart' hide DownloadStats;
+import '../models/task.dart';
 import '../services/download_service.dart';
 
 enum FilterType { all, downloading, completed, paused, failed }
@@ -8,7 +10,7 @@ enum FilterType { all, downloading, completed, paused, failed }
 class TaskProvider extends ChangeNotifier {
   final DownloadService _service;
 
-  List<DownloadTask> _tasks = [];
+  List<Task> _tasks = [];
   bool _isLoading = false;
   String? _error;
   FilterType _currentFilter = FilterType.all;
@@ -20,7 +22,7 @@ class TaskProvider extends ChangeNotifier {
       : _service = service ?? DownloadService();
 
   // Getters
-  List<DownloadTask> get tasks => _filteredTasks;
+  List<Task> get tasks => _filteredTasks;
   bool get isLoading => _isLoading;
   String? get error => _error;
   FilterType get currentFilter => _currentFilter;
@@ -30,25 +32,25 @@ class TaskProvider extends ChangeNotifier {
 
   DownloadStats get stats => DownloadStats.fromTasks(_tasks);
 
-  List<DownloadTask> get _filteredTasks {
+  List<Task> get _filteredTasks {
     var filtered = _tasks;
 
     // 按状态过滤
     switch (_currentFilter) {
       case FilterType.downloading:
         filtered = filtered.where((t) =>
-        t.status == TaskStatus.downloading ||
-            t.status == TaskStatus.waiting
+        t.phase == TaskPhase.TpDownRunning ||
+            t.phase == TaskPhase.TpDownWaiting
         ).toList();
         break;
       case FilterType.completed:
-        filtered = filtered.where((t) => t.status == TaskStatus.completed).toList();
+        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownCompleted).toList();
         break;
       case FilterType.paused:
-        filtered = filtered.where((t) => t.status == TaskStatus.paused).toList();
+        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownPaused).toList();
         break;
       case FilterType.failed:
-        filtered = filtered.where((t) => t.status == TaskStatus.failed).toList();
+        filtered = filtered.where((t) => t.phase == TaskPhase.TpDownFailed).toList();
         break;
       case FilterType.all:
         break;
@@ -57,7 +59,7 @@ class TaskProvider extends ChangeNotifier {
     // 搜索过滤
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((t) =>
-          t.fileName.toLowerCase().contains(_searchQuery.toLowerCase())
+          t.name.toLowerCase().contains(_searchQuery.toLowerCase())
       ).toList();
     }
 
@@ -77,7 +79,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _tasks = await _service.fetchTasks();
+      _tasks = await listTasks();
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -90,9 +92,9 @@ class TaskProvider extends ChangeNotifier {
   /// 开始实时更新
   void _startRealtimeUpdates() {
     _streamSubscription?.cancel();
-    _streamSubscription = _service.getTasksStream().listen(
-          (tasks) {
-        _tasks = tasks;
+    _streamSubscription = Stream.periodic(const Duration(seconds: 5), (_) async => await listTasks()).listen(
+          (tasks) async {
+        _tasks = await tasks;
         notifyListeners();
       },
       onError: (e) {
@@ -122,7 +124,6 @@ class TaskProvider extends ChangeNotifier {
   Future<void> pauseTask(String taskId) async {
     try {
       await _service.pauseTask(taskId);
-      _updateTaskStatus(taskId, TaskStatus.paused);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -133,7 +134,6 @@ class TaskProvider extends ChangeNotifier {
   Future<void> resumeTask(String taskId) async {
     try {
       await _service.resumeTask(taskId);
-      _updateTaskStatus(taskId, TaskStatus.downloading);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -157,7 +157,6 @@ class TaskProvider extends ChangeNotifier {
   Future<void> retryTask(String taskId) async {
     try {
       await _service.retryTask(taskId);
-      _updateTaskStatus(taskId, TaskStatus.downloading);
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -171,7 +170,6 @@ class TaskProvider extends ChangeNotifier {
       operation: 'pause',
     );
     for (var id in _selectedTaskIds) {
-      _updateTaskStatus(id, TaskStatus.paused);
     }
     _selectedTaskIds.clear();
     notifyListeners();
@@ -186,17 +184,6 @@ class TaskProvider extends ChangeNotifier {
     _tasks.removeWhere((t) => _selectedTaskIds.contains(t.id));
     _selectedTaskIds.clear();
     notifyListeners();
-  }
-
-  void _updateTaskStatus(String taskId, TaskStatus status) {
-    final index = _tasks.indexWhere((t) => t.id == taskId);
-    if (index != -1) {
-      _tasks[index] = _tasks[index].copyWith(
-        status: status,
-        speed: status == TaskStatus.paused ? 0 : _tasks[index].speed,
-      );
-      notifyListeners();
-    }
   }
 
   /// 设置过滤器

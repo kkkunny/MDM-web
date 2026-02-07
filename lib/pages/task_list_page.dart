@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mdm/providers/task_provider.dart';
+import 'package:mdm/widgets/overview_panel.dart';
+import 'package:mdm/widgets/task_list_panel.dart';
 import 'package:provider/provider.dart';
-import '../providers/task_provider.dart';
-import '../widgets/overview_panel.dart';
-import '../widgets/task_list_panel.dart';
 
 class TaskListPage extends StatefulWidget {
   const TaskListPage({super.key});
@@ -34,7 +34,7 @@ class _TaskListPageState extends State<TaskListPage> {
           // 分割线
           Container(
             width: 1,
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
           // 右侧任务列表
           const Expanded(

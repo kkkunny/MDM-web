@@ -37,6 +37,9 @@ dependencies:
 
   http: ^1.6.0 # http请求
   provider: ^6.1.5+1
+  protobuf: ^6.0.0 # protobuf
+  fixnum: ^1.1.1 # protobuf依赖
+  dio: ^5.9.0 # http请求
 
 dev_dependencies:
   flutter_test:

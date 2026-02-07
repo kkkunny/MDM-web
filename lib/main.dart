@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'providers/task_provider.dart';
 import 'pages/task_list_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

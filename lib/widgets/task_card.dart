@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/download_task.dart';
+import 'package:mdm/models/task.dart';
+import 'package:mdm/models/vo/task.pb.dart';
 
 class TaskCard extends StatefulWidget {
-  final DownloadTask task;
+  final Task task;
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onPause;
@@ -126,7 +127,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.task.fileName,
+                widget.task.name,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -153,8 +154,8 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   }
 
   Widget _buildFileIcon() {
-    final iconData = _getFileIcon(widget.task.fileName);
-    final color = _getStatusColor(widget.task.status);
+    final iconData = _getFileIcon(widget.task.name);
+    final color = _getStatusColor(widget.task.phase);
 
     return Container(
       width: 48,
@@ -210,8 +211,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   }
 
   Widget _buildStatusBadge() {
-    final color = _getStatusColor(widget.task.status);
-    final label = _getStatusLabel(widget.task.status);
+    final color = _getStatusColor(widget.task.phase);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -223,7 +223,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.task.status == TaskStatus.downloading)
+          if (widget.task.phase == TaskPhase.TpDownRunning)
             SizedBox(
               width: 12,
               height: 12,
@@ -243,7 +243,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
             ),
           const SizedBox(width: 6),
           Text(
-            label,
+            widget.task.phase.label,
             style: TextStyle(
               color: color,
               fontSize: 12,
@@ -263,7 +263,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        widget.task.category!,
+        widget.task.category.name,
         style: TextStyle(
           color: Colors.white.withOpacity(0.5),
           fontSize: 12,
@@ -275,21 +275,21 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   Widget _buildActionButtons() {
     return Row(
       children: [
-        if (widget.task.status == TaskStatus.downloading)
+        if (widget.task.phase == TaskPhase.TpDownRunning)
           _buildIconButton(
             icon: Icons.pause_rounded,
             color: const Color(0xFFFFBE0B),
             onPressed: widget.onPause,
             tooltip: 'Pause',
           ),
-        if (widget.task.status == TaskStatus.paused)
+        if (widget.task.phase == TaskPhase.TpDownPaused)
           _buildIconButton(
             icon: Icons.play_arrow_rounded,
             color: const Color(0xFF4ECDC4),
             onPressed: widget.onResume,
             tooltip: 'Resume',
           ),
-        if (widget.task.status == TaskStatus.failed)
+        if (widget.task.phase == TaskPhase.TpDownFailed)
           _buildIconButton(
             icon: Icons.refresh_rounded,
             color: const Color(0xFF667EEA),
@@ -339,8 +339,8 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   }
 
   Widget _buildProgressSection() {
-    final progress = widget.task.progress;
-    final color = _getStatusColor(widget.task.status);
+    final progress = widget.task.downloadStats.progress;
+    final color = _getStatusColor(widget.task.phase);
 
     return Column(
       children: [
@@ -357,14 +357,14 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: 8,
-                width: MediaQuery.of(context).size.width * progress * 0.4,
+                width: MediaQuery.of(context).size.width * (widget.task.downloadStats.progress.toDouble()/widget.task.size.toDouble()) * 0.4,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: widget.task.status == TaskStatus.downloading
+                    colors: widget.task.phase == TaskPhase.TpDownRunning
                         ? [const Color(0xFF4ECDC4), const Color(0xFF44A08D)]
                         : [color, color.withOpacity(0.7)],
                   ),
-                  boxShadow: widget.task.status == TaskStatus.downloading
+                  boxShadow: widget.task.phase == TaskPhase.TpDownRunning
                       ? [
                     BoxShadow(
                       color: const Color(0xFF4ECDC4).withOpacity(0.5),
@@ -382,7 +382,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${(progress * 100).toStringAsFixed(1)}%',
+              '${(widget.task.downloadStats.progress.toDouble()/widget.task.size.toDouble() * 100).toStringAsFixed(1)}%',
               style: TextStyle(
                 color: color,
                 fontSize: 14,
@@ -390,7 +390,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
               ),
             ),
             Text(
-              '${_formatSize(widget.task.downloadedSize)} / ${_formatSize(widget.task.totalSize)}',
+              '${_formatSize(widget.task.downloadStats.progress.toInt())} / ${_formatSize(widget.task.size.toInt())}',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.5),
                 fontSize: 13,
@@ -405,7 +405,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
   Widget _buildFooter() {
     return Row(
       children: [
-        if (widget.task.status == TaskStatus.downloading) ...[
+        if (widget.task.phase == TaskPhase.TpDownRunning) ...[
           Icon(
             Icons.speed_rounded,
             color: Colors.white.withOpacity(0.4),
@@ -413,7 +413,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
           ),
           const SizedBox(width: 6),
           Text(
-            '${_formatSpeed(widget.task.speed)}/s',
+            '${_formatSpeed(widget.task.downloadStats.speed.toDouble())}/s',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 13,
@@ -427,7 +427,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
           ),
           const SizedBox(width: 6),
           Text(
-            _formatDuration(widget.task.estimatedTime),
+            _formatDuration(Duration(seconds: ((widget.task.size.toInt()-widget.task.downloadStats.progress.toInt())/widget.task.downloadStats.speed.toInt()).toInt())),
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 13,
@@ -442,7 +442,7 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
         ),
         const SizedBox(width: 4),
         Text(
-          _formatDateTime(widget.task.createdAt),
+          _formatDateTime(DateTime.fromMillisecondsSinceEpoch(widget.task.createdAt.toInt()*1000)),
           style: TextStyle(
             color: Colors.white.withOpacity(0.4),
             fontSize: 12,
@@ -452,33 +452,20 @@ class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin
     );
   }
 
-  Color _getStatusColor(TaskStatus status) {
+  Color _getStatusColor(TaskPhase status) {
     switch (status) {
-      case TaskStatus.downloading:
+      case TaskPhase.TpDownRunning:
         return const Color(0xFF4ECDC4);
-      case TaskStatus.completed:
+      case TaskPhase.TpDownCompleted:
         return const Color(0xFF00FF88);
-      case TaskStatus.paused:
+      case TaskPhase.TpDownPaused:
         return const Color(0xFFFFBE0B);
-      case TaskStatus.failed:
+      case TaskPhase.TpDownFailed:
         return const Color(0xFFFF6B6B);
-      case TaskStatus.waiting:
+      case TaskPhase.TpDownWaiting:
         return const Color(0xFF9CA3AF);
-    }
-  }
-
-  String _getStatusLabel(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.downloading:
-        return 'Downloading';
-      case TaskStatus.completed:
-        return 'Completed';
-      case TaskStatus.paused:
-        return 'Paused';
-      case TaskStatus.failed:
-        return 'Failed';
-      case TaskStatus.waiting:
-        return 'Waiting';
+      default:
+        return const Color(0xFF9CA3AF);
     }
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart' as http;
-import '../models/download_task.dart';
+import 'package:mdm/models/vo/task.pb.dart';
 
 /// 下载服务 - 预留网络请求接口
 class DownloadService {
@@ -10,35 +11,8 @@ class DownloadService {
 
   DownloadService({http.Client? client}) : _client = client ?? http.Client();
 
-  /// 获取所有任务列表
-  Future<List<DownloadTask>> fetchTasks({
-    TaskStatus? status,
-    String? category,
-    int page = 1,
-    int pageSize = 20,
-  }) async {
-    // TODO: 替换为实际API调用
-    // final uri = Uri.parse('$baseUrl/tasks').replace(queryParameters: {
-    //   if (status != null) 'status': status.name,
-    //   if (category != null) 'category': category,
-    //   'page': page.toString(),
-    //   'pageSize': pageSize.toString(),
-    // });
-    //
-    // final response = await _client.get(uri);
-    // if (response.statusCode == 200) {
-    //   final List<dynamic> data = json.decode(response.body);
-    //   return data.map((e) => DownloadTask.fromJson(e)).toList();
-    // }
-    // throw Exception('Failed to fetch tasks');
-
-    // 模拟数据
-    await Future.delayed(const Duration(milliseconds: 500));
-    return _generateMockTasks();
-  }
-
   /// 添加新下载任务
-  Future<DownloadTask> addTask({
+  Future<Task> addTask({
     required String url,
     String? fileName,
     String? category,
@@ -60,16 +34,17 @@ class DownloadService {
     // throw Exception('Failed to add task');
 
     await Future.delayed(const Duration(milliseconds: 300));
-    return DownloadTask(
+    return Task(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      fileName: fileName ?? 'new_file.zip',
-      url: url,
-      totalSize: 1024 * 1024 * 100,
-      downloadedSize: 0,
-      speed: 0,
-      status: TaskStatus.waiting,
-      createdAt: DateTime.now(),
-      category: category,
+      name: fileName ?? 'new_file.zip',
+      size: Int64(1024 * 1024 * 100),
+      downloadStats: DownloadStats(
+        speed: Int64(1),
+        progress: Int64(0),
+      ),
+      phase: TaskPhase.TpDownWaiting,
+      createdAt: Int64(DateTime.now().second),
+      category: Category(name: category ?? ''),
     );
   }
 
@@ -128,112 +103,105 @@ class DownloadService {
     return true;
   }
 
-  /// 获取实时进度流
-  Stream<List<DownloadTask>> getTasksStream() {
-    // TODO: 替换为WebSocket或SSE连接
-    // return WebSocketChannel.connect(Uri.parse('ws://your-server/tasks/stream'))
-    //   .stream
-    //   .map((data) => (json.decode(data) as List)
-    //     .map((e) => DownloadTask.fromJson(e))
-    //     .toList());
-
-    // 模拟实时更新
-    return Stream.periodic(const Duration(seconds: 1), (_) {
-      return _generateMockTasks();
-    });
-  }
-
   /// 生成模拟数据
-  List<DownloadTask> _generateMockTasks() {
+  List<Task> _generateMockTasks() {
     final now = DateTime.now();
     return [
-      DownloadTask(
+      Task(
         id: '1',
-        fileName: 'Flutter_SDK_3.16.0.zip',
-        url: 'https://example.com/flutter.zip',
-        totalSize: 1024 * 1024 * 850,
-        downloadedSize: (1024 * 1024 * 850 * 0.67).round(),
-        speed: 1024 * 1024 * 2.5,
-        status: TaskStatus.downloading,
-        createdAt: now.subtract(const Duration(minutes: 30)),
-        category: 'Development',
+        name: 'Flutter_SDK_3.16.0.zip',
+          size: Int64(1024 * 1024 * 850),
+        downloadStats: DownloadStats(
+          speed: Int64((1024 * 1024 * 2.5).toInt()),
+          progress: Int64((1024 * 1024 * 850 * 0.67).round()),
+        ),
+        phase: TaskPhase.TpDownRunning,
+        createdAt: Int64(now.subtract(const Duration(minutes: 30)).second),
+        category: Category(name: 'Development'),
       ),
-      DownloadTask(
+      Task(
         id: '2',
-        fileName: 'VS_Code_Setup.exe',
-        url: 'https://example.com/vscode.exe',
-        totalSize: 1024 * 1024 * 95,
-        downloadedSize: (1024 * 1024 * 95 * 0.45).round(),
-        speed: 1024 * 1024 * 1.8,
-        status: TaskStatus.downloading,
-        createdAt: now.subtract(const Duration(minutes: 15)),
-        category: 'Development',
+        name: 'VS_Code_Setup.exe',
+    size: Int64(1024 * 1024 * 95),
+        downloadStats: DownloadStats(
+          speed: Int64((1024 * 1024 * 1.8).toInt()),
+          progress: Int64((1024 * 1024 * 95 * 0.45).round()),
+        ),
+        phase: TaskPhase.TpDownRunning,
+        createdAt: Int64(now.subtract(const Duration(minutes: 15)).second),
+        category: Category(name: 'Development'),
       ),
-      DownloadTask(
+      Task(
         id: '3',
-        fileName: 'Ubuntu_22.04_LTS.iso',
-        url: 'https://example.com/ubuntu.iso',
-        totalSize: 1024 * 1024 * 1024 * 4,
-        downloadedSize: (1024 * 1024 * 1024 * 4 * 0.23).round(),
-        speed: 1024 * 1024 * 5.2,
-        status: TaskStatus.downloading,
-        createdAt: now.subtract(const Duration(hours: 1)),
-        category: 'OS',
+        name: 'Ubuntu_22.04_LTS.iso',
+    size: Int64(1024 * 1024 * 1024 * 4),
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64((1024 * 1024 * 1024 * 4 * 0.23).round()),
+        ),
+        phase: TaskPhase.TpDownRunning,
+        createdAt: Int64(now.subtract(const Duration(hours: 1)).second),
+        category: Category(name: 'OS'),
       ),
-      DownloadTask(
+      Task(
         id: '4',
-        fileName: 'Android_Studio.dmg',
-        url: 'https://example.com/android-studio.dmg',
-        totalSize: 1024 * 1024 * 920,
-        downloadedSize: 1024 * 1024 * 920,
-        speed: 0,
-        status: TaskStatus.completed,
-        createdAt: now.subtract(const Duration(hours: 2)),
-        category: 'Development',
+        name: 'Android_Studio.dmg',
+    size: Int64(1024 * 1024 * 920),
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64(1024 * 1024 * 920),
+        ),
+        phase: TaskPhase.TpDownCompleted,
+        createdAt: Int64(now.subtract(const Duration(hours: 2)).second),
+        category: Category(name: 'Development'),
       ),
-      DownloadTask(
+      Task(
         id: '5',
-        fileName: 'NodeJS_v20.10.0.pkg',
-        url: 'https://example.com/nodejs.pkg',
-        totalSize: 1024 * 1024 * 45,
-        downloadedSize: (1024 * 1024 * 45 * 0.8).round(),
-        speed: 0,
-        status: TaskStatus.paused,
-        createdAt: now.subtract(const Duration(hours: 3)),
-        category: 'Development',
+        name: 'NodeJS_v20.10.0.pkg',
+    size: Int64(1024 * 1024 * 45),
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64((1024 * 1024 * 45 * 0.8).round()),
+        ),
+        phase: TaskPhase.TpDownPaused,
+        createdAt: Int64(now.subtract(const Duration(hours: 3)).second),
+        category: Category(name: 'Development'),
       ),
-      DownloadTask(
+      Task(
         id: '6',
-        fileName: 'Docker_Desktop.exe',
-        url: 'https://example.com/docker.exe',
-        totalSize: 1024 * 1024 * 580,
-        downloadedSize: (1024 * 1024 * 580 * 0.12).round(),
-        speed: 0,
-        status: TaskStatus.failed,
-        createdAt: now.subtract(const Duration(hours: 4)),
-        category: 'Development',
+        name: 'Docker_Desktop.exe',
+    size: Int64(1024 * 1024 * 580),
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64((1024 * 1024 * 580 * 0.12).round()),
+        ),
+        phase: TaskPhase.TpDownFailed,
+        createdAt: Int64(now.subtract(const Duration(hours: 4)).second),
+        category: Category(name: 'Development'),
       ),
-      DownloadTask(
+      Task(
         id: '7',
-        fileName: 'Figma_Desktop.dmg',
-        url: 'https://example.com/figma.dmg',
-        totalSize: 1024 * 1024 * 250,
-        downloadedSize: 1024 * 1024 * 250,
-        speed: 0,
-        status: TaskStatus.completed,
-        createdAt: now.subtract(const Duration(days: 1)),
-        category: 'Design',
+        name: 'Figma_Desktop.dmg',
+    size: Int64(1024 * 1024 * 250),
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64(1024 * 1024 * 250),
+        ),
+        phase: TaskPhase.TpDownCompleted,
+        createdAt: Int64(now.subtract(const Duration(days: 1)).second),
+        category: Category(name: 'Design'),
       ),
-      DownloadTask(
+      Task(
         id: '8',
-        fileName: 'Postman_Agent.zip',
-        url: 'https://example.com/postman.zip',
-        totalSize: 1024 * 1024 * 180,
-        downloadedSize: 0,
-        speed: 0,
-        status: TaskStatus.waiting,
-        createdAt: now,
-        category: 'Development',
+        name: 'Postman_Agent.zip',
+        downloadStats: DownloadStats(
+          speed: Int64(0),
+          progress: Int64(0),
+        ),
+        size: Int64(1024 * 1024 * 180),
+        phase: TaskPhase.TpDownWaiting,
+        createdAt: Int64(now.second),
+        category: Category(name: 'Development'),
       ),
     ];
   }
