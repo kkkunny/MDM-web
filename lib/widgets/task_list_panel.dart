@@ -3,6 +3,7 @@ import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/constants/strings.dart';
 import 'package:mdm/providers/task_provider.dart';
+import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/widgets/common/app_button.dart';
 import 'package:mdm/widgets/common/app_dialog.dart';
 import 'package:mdm/widgets/task_card.dart';
@@ -13,8 +14,11 @@ class TaskListPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Container(
-      color: AppColors.background,
+      color: isDark ? AppColors.background : AppColors.lightBackground,
       child: Column(
         children: [
           _buildToolbar(context),
@@ -25,28 +29,33 @@ class TaskListPanel extends StatelessWidget {
   }
 
   Widget _buildToolbar(BuildContext context) {
-    return Consumer<TaskProvider>(
-      builder: (context, provider, _) {
+    return Consumer2<TaskProvider, ThemeProvider>(
+      builder: (context, provider, themeProvider, _) {
+        final isDark = themeProvider.isDarkMode;
         return Container(
           padding: const EdgeInsets.all(AppStyles.paddingXLarge),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: isDark ? AppColors.surface : AppColors.lightSurface,
             border: Border(
-              bottom: BorderSide(color: AppColors.white.withValues(alpha: 0.1)),
+              bottom: BorderSide(
+                color: isDark
+                    ? AppColors.white.withValues(alpha: 0.1)
+                    : AppColors.lightDivider,
+              ),
             ),
           ),
           child: Column(
             children: [
               Row(
                 children: [
-                  Expanded(child: _buildSearchBar(context, provider)),
+                  Expanded(child: _buildSearchBar(context, provider, isDark)),
                   const SizedBox(width: AppStyles.paddingLarge),
                   _buildAddButton(context),
                 ],
               ),
               if (provider.hasSelection) ...[
                 const SizedBox(height: AppStyles.paddingLarge),
-                _buildSelectionToolbar(context, provider),
+                _buildSelectionToolbar(context, provider, isDark),
               ],
             ],
           ),
@@ -55,21 +64,36 @@ class TaskListPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, TaskProvider provider) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    TaskProvider provider,
+    bool isDark,
+  ) {
     return Container(
       height: AppStyles.inputHeight,
       decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.05),
+        color: isDark
+            ? AppColors.white.withValues(alpha: 0.05)
+            : AppColors.lightSurfaceLight,
         borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: isDark
+              ? AppColors.white.withValues(alpha: 0.1)
+              : AppColors.lightDivider,
+        ),
       ),
       child: TextField(
         onChanged: provider.setSearchQuery,
-        style: const TextStyle(color: AppColors.white),
+        style: TextStyle(color: isDark ? AppColors.white : AppColors.lightText),
         decoration: InputDecoration(
           hintText: AppStrings.searchDownloads,
-          hintStyle: TextStyle(color: AppColors.white40),
-          prefixIcon: Icon(Icons.search_rounded, color: AppColors.white40),
+          hintStyle: TextStyle(
+            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppStyles.paddingLarge,
@@ -88,7 +112,11 @@ class TaskListPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectionToolbar(BuildContext context, TaskProvider provider) {
+  Widget _buildSelectionToolbar(
+    BuildContext context,
+    TaskProvider provider,
+    bool isDark,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppStyles.paddingLarge,
@@ -113,6 +141,7 @@ class TaskListPanel extends StatelessWidget {
             icon: Icons.pause_rounded,
             label: AppStrings.pauseAll,
             onTap: () => provider.pauseSelected(),
+            isDark: isDark,
           ),
           const SizedBox(width: AppStyles.paddingMedium),
           _buildToolbarButton(
@@ -120,12 +149,14 @@ class TaskListPanel extends StatelessWidget {
             label: AppStrings.delete,
             color: AppColors.error,
             onTap: () => _showDeleteConfirmDialog(context, provider),
+            isDark: isDark,
           ),
           const SizedBox(width: AppStyles.paddingMedium),
           _buildToolbarButton(
             icon: Icons.close_rounded,
             label: AppStrings.cancel,
             onTap: () => provider.clearSelection(),
+            isDark: isDark,
           ),
         ],
       ),
@@ -137,6 +168,7 @@ class TaskListPanel extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
     Color color = AppColors.white70,
+    bool isDark = true,
   }) {
     return Material(
       color: Colors.transparent,

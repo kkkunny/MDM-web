@@ -24,4 +24,11 @@ class AppColors {
 
   static const Color gradientStart = Color(0xFF667EEA);
   static const Color gradientEnd = Color(0xFF764BA2);
+
+  static const Color lightBackground = Color(0xFFF5F7FA);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceLight = Color(0xFFF0F2F5);
+  static const Color lightText = Color(0xFF1A1A2E);
+  static const Color lightTextSecondary = Color(0xFF6B7280);
+  static const Color lightDivider = Color(0xFFE5E7EB);
 }

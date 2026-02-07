@@ -3,9 +3,11 @@ import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/models/task.dart';
 import 'package:mdm/models/vo/task.pb.dart';
+import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
 import 'package:mdm/utils/icon_helper.dart';
+import 'package:provider/provider.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
@@ -58,6 +60,8 @@ class _TaskCardState extends State<TaskCard>
   @override
   Widget build(BuildContext context) {
     final statusColor = ColorHelper.getStatusColor(widget.task.phase);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
 
     return MouseRegion(
       onEnter: (_) {
@@ -87,7 +91,9 @@ class _TaskCardState extends State<TaskCard>
                           ],
                         )
                       : null,
-                  color: widget.isSelected ? null : AppColors.surface,
+                  color: widget.isSelected
+                      ? null
+                      : (isDark ? AppColors.surface : AppColors.lightSurface),
                   borderRadius: BorderRadius.circular(
                     AppStyles.borderRadiusLarge,
                   ),
@@ -95,8 +101,12 @@ class _TaskCardState extends State<TaskCard>
                     color: widget.isSelected
                         ? AppColors.primary.withValues(alpha: 0.5)
                         : _isHovered
-                        ? AppColors.white.withValues(alpha: 0.2)
-                        : AppColors.white.withValues(alpha: 0.05),
+                        ? (isDark
+                              ? AppColors.white.withValues(alpha: 0.2)
+                              : AppColors.lightDivider)
+                        : (isDark
+                              ? AppColors.white.withValues(alpha: 0.05)
+                              : AppColors.lightDivider),
                     width: widget.isSelected
                         ? AppStyles.borderWidthMedium
                         : AppStyles.borderWidthThin,
@@ -116,11 +126,11 @@ class _TaskCardState extends State<TaskCard>
                 ),
                 child: Column(
                   children: [
-                    _buildHeader(statusColor),
+                    _buildHeader(statusColor, isDark),
                     const SizedBox(height: AppStyles.spacingLarge),
-                    _buildProgressSection(statusColor),
+                    _buildProgressSection(statusColor, isDark),
                     const SizedBox(height: AppStyles.spacingLarge),
-                    _buildFooter(statusColor),
+                    _buildFooter(statusColor, isDark),
                   ],
                 ),
               ),
@@ -131,7 +141,7 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildHeader(Color statusColor) {
+  Widget _buildHeader(Color statusColor, bool isDark) {
     return Row(
       children: [
         _buildFileIcon(statusColor),
@@ -142,8 +152,8 @@ class _TaskCardState extends State<TaskCard>
             children: [
               Text(
                 widget.task.name,
-                style: const TextStyle(
-                  color: AppColors.white,
+                style: TextStyle(
+                  color: isDark ? AppColors.white : AppColors.lightText,
                   fontSize: AppStyles.fontSizeLarge,
                   fontWeight: FontWeight.w600,
                 ),
@@ -156,7 +166,7 @@ class _TaskCardState extends State<TaskCard>
                   _buildStatusBadge(statusColor),
                   const SizedBox(width: 8),
                   if (widget.task.category.name.isNotEmpty)
-                    _buildCategoryBadge(),
+                    _buildCategoryBadge(isDark),
                 ],
               ),
             ],
@@ -226,17 +236,19 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildCategoryBadge() {
+  Widget _buildCategoryBadge(bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.05),
+        color: isDark
+            ? AppColors.white.withValues(alpha: 0.05)
+            : AppColors.lightSurfaceLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         widget.task.category.name,
         style: TextStyle(
-          color: AppColors.white50,
+          color: isDark ? AppColors.white50 : AppColors.lightTextSecondary,
           fontSize: AppStyles.fontSizeSmall,
         ),
       ),
@@ -305,7 +317,7 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildProgressSection(Color statusColor) {
+  Widget _buildProgressSection(Color statusColor, bool isDark) {
     final progress = widget.task.downloadStats.progress;
     final total = widget.task.size;
 
@@ -318,7 +330,9 @@ class _TaskCardState extends State<TaskCard>
               Container(
                 height: 8,
                 decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.1),
+                  color: isDark
+                      ? AppColors.white.withValues(alpha: 0.1)
+                      : AppColors.lightDivider,
                 ),
               ),
               AnimatedContainer(
@@ -332,7 +346,10 @@ class _TaskCardState extends State<TaskCard>
                   gradient: widget.task.phase == TaskPhase.TpDownRunning
                       ? ColorHelper.getRunningGradient()
                       : LinearGradient(
-                          colors: [statusColor, statusColor.withValues(alpha: 0.7)],
+                          colors: [
+                            statusColor,
+                            statusColor.withValues(alpha: 0.7),
+                          ],
                         ),
                   boxShadow: widget.task.phase == TaskPhase.TpDownRunning
                       ? [
@@ -364,7 +381,12 @@ class _TaskCardState extends State<TaskCard>
             ),
             Text(
               '${FormatHelper.formatSize(progress.toInt())} / ${FormatHelper.formatSize(total.toInt())}',
-              style: TextStyle(color: AppColors.white50, fontSize: 13),
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.white50
+                    : AppColors.lightTextSecondary,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -372,24 +394,27 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildFooter(Color statusColor) {
+  Widget _buildFooter(Color statusColor, bool isDark) {
     return Row(
       children: [
         if (widget.task.phase == TaskPhase.TpDownRunning) ...[
           Icon(
             Icons.speed_rounded,
-            color: AppColors.white40,
+            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
             size: AppStyles.iconSizeSmall,
           ),
           const SizedBox(width: 6),
           Text(
             '${FormatHelper.formatSpeed(widget.task.downloadStats.speed.toDouble())}/s',
-            style: TextStyle(color: AppColors.white60, fontSize: 13),
+            style: TextStyle(
+              color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(width: 16),
           Icon(
             Icons.timer_outlined,
-            color: AppColors.white40,
+            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
             size: AppStyles.iconSizeSmall,
           ),
           const SizedBox(width: 6),
@@ -403,11 +428,18 @@ class _TaskCardState extends State<TaskCard>
                         .toInt(),
               ),
             ),
-            style: TextStyle(color: AppColors.white60, fontSize: 13),
+            style: TextStyle(
+              color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,
+              fontSize: 13,
+            ),
           ),
         ],
         const Spacer(),
-        Icon(Icons.access_time_rounded, color: AppColors.white30, size: 14),
+        Icon(
+          Icons.access_time_rounded,
+          color: isDark ? AppColors.white30 : AppColors.lightTextSecondary,
+          size: 14,
+        ),
         const SizedBox(width: 4),
         Text(
           FormatHelper.formatDateTime(
@@ -416,7 +448,7 @@ class _TaskCardState extends State<TaskCard>
             ),
           ),
           style: TextStyle(
-            color: AppColors.white40,
+            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
             fontSize: AppStyles.fontSizeSmall,
           ),
         ),

@@ -34,12 +34,20 @@ class ColorHelper {
     );
   }
 
-  static LinearGradient getSurfaceGradient() {
-    return const LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [AppColors.surface, AppColors.surfaceLight],
-    );
+  static LinearGradient getSurfaceGradient({bool isDark = true}) {
+    if (isDark) {
+      return const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.surface, AppColors.surfaceLight],
+      );
+    } else {
+      return const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.lightSurface, AppColors.lightSurfaceLight],
+      );
+    }
   }
 
   static LinearGradient getRunningGradient() {

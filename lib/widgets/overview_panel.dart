@@ -3,6 +3,7 @@ import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/constants/strings.dart';
 import 'package:mdm/providers/task_provider.dart';
+import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
 import 'package:mdm/utils/icon_helper.dart';
@@ -14,8 +15,13 @@ class OverviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Container(
-      decoration: BoxDecoration(gradient: ColorHelper.getSurfaceGradient()),
+      decoration: BoxDecoration(
+        gradient: ColorHelper.getSurfaceGradient(isDark: isDark),
+      ),
       child: Column(
         children: [
           _buildHeader(),
@@ -42,51 +48,83 @@ class OverviewPanel extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(AppStyles.paddingXXLarge),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppStyles.paddingMedium),
-            decoration: BoxDecoration(
-              gradient: ColorHelper.getPrimaryGradient(),
-              borderRadius: BorderRadius.circular(AppStyles.borderRadiusLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.4),
-                  blurRadius: AppStyles.blurRadiusMedium,
-                  offset: const Offset(0, AppStyles.shadowOffsetMedium),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.download_rounded,
-              color: AppColors.white,
-              size: AppStyles.iconSizeXLarge,
-            ),
-          ),
-          const SizedBox(width: AppStyles.spacingLarge),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return Container(
+          padding: const EdgeInsets.all(AppStyles.paddingXXLarge),
+          child: Row(
             children: [
-              Text(
-                AppStrings.download,
-                style: TextStyle(
+              Container(
+                padding: const EdgeInsets.all(AppStyles.paddingMedium),
+                decoration: BoxDecoration(
+                  gradient: ColorHelper.getPrimaryGradient(),
+                  borderRadius: BorderRadius.circular(
+                    AppStyles.borderRadiusLarge,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: AppStyles.blurRadiusMedium,
+                      offset: const Offset(0, AppStyles.shadowOffsetMedium),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.download_rounded,
                   color: AppColors.white,
-                  fontSize: AppStyles.fontSizeXXLarge,
-                  fontWeight: FontWeight.bold,
+                  size: AppStyles.iconSizeXLarge,
                 ),
               ),
-              Text(
-                AppStrings.manager,
-                style: TextStyle(
-                  color: AppColors.white54,
-                  fontSize: AppStyles.fontSizeMedium,
-                ),
+              const SizedBox(width: AppStyles.spacingLarge),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.download,
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: AppStyles.fontSizeXXLarge,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    AppStrings.manager,
+                    style: TextStyle(
+                      color: AppColors.white54,
+                      fontSize: AppStyles.fontSizeMedium,
+                    ),
+                  ),
+                ],
               ),
+              const Spacer(),
+              _buildThemeToggle(context, themeProvider),
             ],
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  Widget _buildThemeToggle(BuildContext context, ThemeProvider themeProvider) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => themeProvider.toggleTheme(),
+        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+        child: Container(
+          padding: const EdgeInsets.all(AppStyles.paddingMedium),
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+          ),
+          child: Icon(
+            themeProvider.isDarkMode
+                ? Icons.light_mode_rounded
+                : Icons.dark_mode_rounded,
+            color: AppColors.white,
+            size: AppStyles.iconSizeLarge,
+          ),
+        ),
       ),
     );
   }
@@ -429,10 +467,14 @@ class OverviewPanel extends StatelessWidget {
               vertical: AppStyles.paddingMedium,
             ),
             decoration: BoxDecoration(
-              color: isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
+              color: isSelected
+                  ? color.withValues(alpha: 0.15)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
               border: Border.all(
-                color: isSelected ? color.withValues(alpha: 0.3) : Colors.transparent,
+                color: isSelected
+                    ? color.withValues(alpha: 0.3)
+                    : Colors.transparent,
               ),
             ),
             child: Row(
