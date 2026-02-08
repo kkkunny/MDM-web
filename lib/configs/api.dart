@@ -12,14 +12,12 @@ extension type Window(JSObject _) implements JSObject {
 @JS()
 extension type Location(JSObject _) implements JSObject {
   external String get href;
-  external String get hostname;
-  external String get pathname;
 }
 
-String getApiHost() {
+String getApiBaseUrl() {
   if (!kReleaseMode) {
-    return 'localhost:8080';
+    return 'http://localhost:8080';
   }
   final uri = Uri.parse(window.location.href);
-  return '${uri.host}:${uri.port}';
+  return uri.origin;
 }
