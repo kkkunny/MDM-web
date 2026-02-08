@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mdm/apis/mdm/task.dart';
 import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/constants/strings.dart';
+import 'package:mdm/models/vo/task.pb.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/providers/theme_provider.dart';
+import 'package:mdm/widgets/add_task_dialog.dart';
 import 'package:mdm/widgets/common/app_button.dart';
 import 'package:mdm/widgets/common/app_dialog.dart';
 import 'package:mdm/widgets/task_card.dart';
@@ -106,9 +109,19 @@ class TaskListPanel extends StatelessWidget {
 
   Widget _buildAddButton(BuildContext context) {
     return AppButton.primary(
-      text: AppStrings.addTask,
+      text: '添加任务',
       icon: Icons.add_rounded,
-      onPressed: () => _showAddTaskDialog(context),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AddTaskDialog(
+          action: (AddTaskData data) async {
+            await createTask(CreateTaskRequest(
+              link: data.link,
+              name: data.taskName,
+            ));
+          },
+        ),
+      ),
     );
   }
 
@@ -280,111 +293,6 @@ class TaskListPanel extends StatelessWidget {
           },
         );
       },
-    );
-  }
-
-  void _showAddTaskDialog(BuildContext context) {
-    final urlController = TextEditingController();
-    final fileNameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
-        ),
-        title: const Text(
-          AppStrings.addNewDownload,
-          style: TextStyle(color: AppColors.white),
-        ),
-        content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: urlController,
-                style: const TextStyle(color: AppColors.white),
-                decoration: InputDecoration(
-                  labelText: AppStrings.downloadUrl,
-                  labelStyle: TextStyle(color: AppColors.white60),
-                  hintText: 'https://example.com/file.zip',
-                  hintStyle: TextStyle(color: AppColors.white30),
-                  filled: true,
-                  fillColor: AppColors.white.withValues(alpha: 0.05),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppStyles.borderRadiusMedium,
-                    ),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.link_rounded,
-                    color: AppColors.white50,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppStyles.paddingLarge),
-              TextField(
-                controller: fileNameController,
-                style: const TextStyle(color: AppColors.white),
-                decoration: InputDecoration(
-                  labelText: AppStrings.fileName,
-                  labelStyle: TextStyle(color: AppColors.white60),
-                  filled: true,
-                  fillColor: AppColors.white.withValues(alpha: 0.05),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppStyles.borderRadiusMedium,
-                    ),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.edit_rounded,
-                    color: AppColors.white50,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              AppStrings.cancel,
-              style: TextStyle(color: AppColors.white60),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (urlController.text.isNotEmpty) {
-                context.read<TaskProvider>().addTask(
-                  urlController.text,
-                  fileName: fileNameController.text.isNotEmpty
-                      ? fileNameController.text
-                      : null,
-                );
-                Navigator.pop(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  AppStyles.borderRadiusMedium,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppStyles.paddingLarge,
-                vertical: AppStyles.paddingMedium,
-              ),
-            ),
-            child: const Text(AppStrings.download),
-          ),
-        ],
-      ),
     );
   }
 

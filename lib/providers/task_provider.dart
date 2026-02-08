@@ -86,7 +86,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _tasks = await listTasks();
+      _tasks = (await listTasks()).tasks;
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -103,8 +103,8 @@ class TaskProvider extends ChangeNotifier {
           const Duration(seconds: AppStyles.refreshIntervalSeconds),
           (_) async => await listTasks(),
         ).listen(
-          (tasks) async {
-            _tasks = await tasks;
+          (resp) async {
+            _tasks = (await resp).tasks;
             notifyListeners();
           },
           onError: (e) {

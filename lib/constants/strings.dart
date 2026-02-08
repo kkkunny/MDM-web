@@ -29,10 +29,6 @@ class AppStrings {
 
   static const String selected = 'selected';
 
-  static const String addNewDownload = 'Add New Download';
-  static const String downloadUrl = 'Download URL';
-  static const String fileName = 'File Name (Optional)';
-
   static const String deleteDownloads = 'Delete Downloads?';
   static const String deleteDownload = 'Delete Download?';
   static const String deleteConfirm =
