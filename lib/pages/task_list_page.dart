@@ -34,7 +34,7 @@ class _TaskListPageState extends State<TaskListPage> {
           : AppColors.lightBackground,
       body: Row(
         children: [
-          SizedBox(width: AppStyles.panelWidth, child: const OverviewPanel()),
+          SizedBox(width: 320.0, child: const OverviewPanel()),
           Container(
             width: 1,
             color: isDark

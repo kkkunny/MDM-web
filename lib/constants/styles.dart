@@ -54,8 +54,6 @@ class AppStyles {
 
   static const Curve animationCurve = Curves.easeOut;
 
-  static const double panelWidth = 320.0;
-
   static const double maxSpeed = 10 * 1024 * 1024;
 
   static const int refreshIntervalSeconds = 5;

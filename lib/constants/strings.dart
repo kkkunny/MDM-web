@@ -49,11 +49,6 @@ class AppStrings {
   static const String hoursAgo = '{}h ago';
   static const String daysAgo = '{}d ago';
 
-  static const String zeroTime = '--:--';
-  static const String hoursMinutes = '{}h {}m';
-  static const String minutesSeconds = '{}m {}s';
-  static const String seconds = '{}s';
-
   static const String perSecond = '/s';
   static const String zeroMB = '0 MB/s';
   static const String tenMB = '10 MB/s';

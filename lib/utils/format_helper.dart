@@ -18,22 +18,23 @@ class FormatHelper {
     return '${(bytesPerSecond / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
 
+  // 格式化时长
   static String formatDuration(Duration duration) {
-    if (duration == Duration.zero) return AppStrings.zeroTime;
+    if (duration == Duration.zero) return '--:--';
+
+    final days = duration.inDays;
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
 
-    if (hours > 0) {
-      return AppStrings.hoursMinutes
-          .replaceAll('{}', hours.toString())
-          .replaceAll('{}', minutes.toString());
+    if (days > 0) {
+      return '${days.toString()}d ${hours.toString()}h';
+    } else if (hours > 0) {
+      return '${hours.toString()}h ${minutes.toString()}m';
     } else if (minutes > 0) {
-      return AppStrings.minutesSeconds
-          .replaceAll('{}', minutes.toString())
-          .replaceAll('{}', seconds.toString());
+      return '${minutes.toString()}m ${seconds.toString()}s';
     } else {
-      return AppStrings.seconds.replaceAll('{}', seconds.toString());
+      return '${seconds.toString()}s';
     }
   }
 

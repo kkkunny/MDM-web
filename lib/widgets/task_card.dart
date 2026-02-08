@@ -323,46 +323,14 @@ class _TaskCardState extends State<TaskCard>
 
     return Column(
       children: [
-        ClipRRect(
+        LinearProgressIndicator(
+          minHeight: 8,
           borderRadius: BorderRadius.circular(6),
-          child: Stack(
-            children: [
-              Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.white.withValues(alpha: 0.1)
-                      : AppColors.lightDivider,
-                ),
-              ),
-              AnimatedContainer(
-                duration: AppStyles.animationDurationLong,
-                height: 8,
-                width:
-                    MediaQuery.of(context).size.width *
-                    (progress.toDouble() / total.toDouble()) *
-                    0.4,
-                decoration: BoxDecoration(
-                  gradient: widget.task.phase == TaskPhase.TpDownRunning
-                      ? ColorHelper.getRunningGradient()
-                      : LinearGradient(
-                          colors: [
-                            statusColor,
-                            statusColor.withValues(alpha: 0.7),
-                          ],
-                        ),
-                  boxShadow: widget.task.phase == TaskPhase.TpDownRunning
-                      ? [
-                          BoxShadow(
-                            color: AppColors.info.withValues(alpha: 0.5),
-                            blurRadius: 8,
-                          ),
-                        ]
-                      : null,
-                ),
-              ),
-            ],
-          ),
+          value: progress.toDouble() / total.toDouble(),
+          backgroundColor: isDark
+            ? AppColors.white.withValues(alpha: 0.1)
+            : AppColors.lightDivider,
+          valueColor: widget.task.phase == TaskPhase.TpDownRunning ? AlwaysStoppedAnimation(AppColors.info): AlwaysStoppedAnimation(statusColor),
         ),
         const SizedBox(height: 12),
         Row(
@@ -420,13 +388,8 @@ class _TaskCardState extends State<TaskCard>
           const SizedBox(width: 6),
           Text(
             FormatHelper.formatDuration(
-              Duration(
-                seconds:
-                    ((widget.task.size.toInt() -
-                                widget.task.downloadStats.progress.toInt()) /
-                            widget.task.downloadStats.speed.toInt())
-                        .toInt(),
-              ),
+              widget.task.downloadStats.speed == 0 ? Duration.zero :
+                Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.progress.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
             ),
             style: TextStyle(
               color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,
