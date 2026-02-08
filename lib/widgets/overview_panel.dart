@@ -14,114 +14,21 @@ class OverviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
-
     return Container(
       decoration: BoxDecoration(
-        gradient: ColorHelper.getSurfaceGradient(isDark: isDark),
+        gradient: ColorHelper.getSurfaceGradient(isDark: false),
       ),
-      child: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppStyles.paddingXLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSpeedCard(context),
-                  const SizedBox(height: AppStyles.spacingXLarge),
-                  _buildStatsGrid(context),
-                  // _buildStorageCard(context),
-                  const SizedBox(height: AppStyles.spacingXLarge),
-                  _buildFilterSection(context),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        return Container(
-          padding: const EdgeInsets.all(AppStyles.paddingXXLarge),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppStyles.paddingMedium),
-                decoration: BoxDecoration(
-                  gradient: ColorHelper.getPrimaryGradient(),
-                  borderRadius: BorderRadius.circular(
-                    AppStyles.borderRadiusLarge,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.4),
-                      blurRadius: AppStyles.blurRadiusMedium,
-                      offset: const Offset(0, AppStyles.shadowOffsetMedium),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.download_rounded,
-                  color: AppColors.white,
-                  size: AppStyles.iconSizeXLarge,
-                ),
-              ),
-              const SizedBox(width: AppStyles.spacingLarge),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.download,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: AppStyles.fontSizeXXLarge,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    AppStrings.manager,
-                    style: TextStyle(
-                      color: AppColors.white54,
-                      fontSize: AppStyles.fontSizeMedium,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              _buildThemeToggle(context, themeProvider),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildThemeToggle(BuildContext context, ThemeProvider themeProvider) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => themeProvider.toggleTheme(),
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-        child: Container(
-          padding: const EdgeInsets.all(AppStyles.paddingMedium),
-          decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-          ),
-          child: Icon(
-            themeProvider.isDarkMode
-                ? Icons.light_mode_rounded
-                : Icons.dark_mode_rounded,
-            color: AppColors.white,
-            size: AppStyles.iconSizeLarge,
-          ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSpeedCard(context),
+            const SizedBox(height: AppStyles.spacingXLarge),
+            _buildStatsGrid(context),
+            const SizedBox(height: AppStyles.spacingXLarge),
+            _buildFilterSection(context),
+          ],
         ),
       ),
     );
