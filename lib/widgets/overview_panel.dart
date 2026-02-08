@@ -7,7 +7,6 @@ import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
 import 'package:mdm/utils/icon_helper.dart';
-import 'package:mdm/widgets/common/app_progress_indicator.dart';
 import 'package:provider/provider.dart';
 
 class OverviewPanel extends StatelessWidget {
@@ -34,8 +33,7 @@ class OverviewPanel extends StatelessWidget {
                   _buildSpeedCard(context),
                   const SizedBox(height: AppStyles.spacingXLarge),
                   _buildStatsGrid(context),
-                  const SizedBox(height: AppStyles.spacingXLarge),
-                  _buildStorageCard(context),
+                  // _buildStorageCard(context),
                   const SizedBox(height: AppStyles.spacingXLarge),
                   _buildFilterSection(context),
                 ],
@@ -220,25 +218,39 @@ class OverviewPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppStyles.spacingLarge),
-              _buildSpeedIndicator(stats.totalSpeed.toDouble()),
+              LinearProgressIndicator(
+                minHeight: AppStyles.progressHeightSmall,
+                borderRadius: BorderRadius.circular(8),
+                value: stats.totalSize > 0
+                    ? stats.totalDownloaded / stats.totalSize
+                    : 0.0,
+                backgroundColor: AppColors.white.withValues(alpha: 0.2),
+                valueColor: AlwaysStoppedAnimation(AppColors.white),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    FormatHelper.formatSize(stats.totalDownloaded),
+                    style: TextStyle(
+                      color: AppColors.white60,
+                      fontSize: AppStyles.fontSizeSmall,
+                    ),
+                  ),
+                  Text(
+                    FormatHelper.formatSize(stats.totalSize),
+                    style: TextStyle(
+                      color: AppColors.white60,
+                      fontSize: AppStyles.fontSizeSmall,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSpeedIndicator(double speed) {
-    final maxSpeed = AppStyles.maxSpeed;
-    final progress = (speed / maxSpeed).clamp(0.0, 1.0);
-
-    return AppProgressIndicator(
-      value: progress,
-      backgroundColor: AppColors.white.withValues(alpha: 0.2),
-      valueColor: AppColors.white,
-      height: AppStyles.progressHeightSmall,
-      showLabel: true,
-      label: '${AppStrings.zeroMB} - ${AppStrings.tenMB}',
     );
   }
 
@@ -343,79 +355,6 @@ class OverviewPanel extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStorageCard(BuildContext context) {
-    return Consumer<TaskProvider>(
-      builder: (context, provider, _) {
-        final stats = provider.stats;
-        final progress = stats.totalSize > 0
-            ? stats.totalDownloaded / stats.totalSize
-            : 0.0;
-
-        return Container(
-          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
-          decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    AppStrings.totalProgress,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: AppStyles.fontSizeMedium,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    '${(progress * 100).toStringAsFixed(1)}%',
-                    style: const TextStyle(
-                      color: AppColors.info,
-                      fontSize: AppStyles.fontSizeMedium,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppStyles.paddingLarge),
-              AppProgressIndicator(
-                value: progress,
-                backgroundColor: AppColors.white.withValues(alpha: 0.1),
-                valueColor: AppColors.info,
-                height: AppStyles.progressHeightLarge,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    FormatHelper.formatSize(stats.totalDownloaded),
-                    style: TextStyle(
-                      color: AppColors.white60,
-                      fontSize: AppStyles.fontSizeSmall,
-                    ),
-                  ),
-                  Text(
-                    FormatHelper.formatSize(stats.totalSize),
-                    style: TextStyle(
-                      color: AppColors.white60,
-                      fontSize: AppStyles.fontSizeSmall,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
