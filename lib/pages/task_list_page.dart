@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/widgets/overview_panel.dart';
