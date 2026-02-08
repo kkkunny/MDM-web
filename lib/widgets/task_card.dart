@@ -14,7 +14,6 @@ class TaskCard extends StatefulWidget {
   final Task task;
   final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
   final VoidCallback onRetry;
 
   const TaskCard({
@@ -22,7 +21,6 @@ class TaskCard extends StatefulWidget {
     required this.task,
     required this.isSelected,
     required this.onTap,
-    required this.onDelete,
     required this.onRetry,
   });
 
@@ -260,6 +258,10 @@ class _TaskCardState extends State<TaskCard>
     operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpResume));
   }
 
+  void _onDelete(){
+    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpDelete));
+  }
+
   Widget _buildActionButtons(Color statusColor) {
     return Row(
       children: [
@@ -288,7 +290,7 @@ class _TaskCardState extends State<TaskCard>
         _buildIconButton(
           icon: Icons.delete_outline_rounded,
           color: AppColors.error,
-          onPressed: widget.onDelete,
+          onPressed: _onDelete,
           tooltip: 'Delete',
         ),
       ],

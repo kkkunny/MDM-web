@@ -285,8 +285,6 @@ class TaskListPanel extends StatelessWidget {
                 task: task,
                 isSelected: provider.selectedTaskIds.contains(task.id),
                 onTap: () => provider.toggleSelection(task.id),
-                onDelete: () =>
-                    _showDeleteSingleConfirmDialog(context, provider, task.id),
                 onRetry: () => provider.retryTask(task.id),
               ),
             );
