@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mdm/apis/mdm/task.dart';
 import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/models/task.dart';
@@ -13,7 +14,6 @@ class TaskCard extends StatefulWidget {
   final Task task;
   final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onDelete;
   final VoidCallback onRetry;
@@ -23,7 +23,6 @@ class TaskCard extends StatefulWidget {
     required this.task,
     required this.isSelected,
     required this.onTap,
-    required this.onPause,
     required this.onResume,
     required this.onDelete,
     required this.onRetry,
@@ -255,14 +254,18 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
+  void _onPause(){
+    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpPause));
+  }
+
   Widget _buildActionButtons(Color statusColor) {
     return Row(
       children: [
-        if (widget.task.phase == TaskPhase.TpDownRunning)
+        if (widget.task.phase == TaskPhase.TpDownWaiting || widget.task.phase == TaskPhase.TpDownRunning)
           _buildIconButton(
             icon: Icons.pause_rounded,
             color: AppColors.warning,
-            onPressed: widget.onPause,
+            onPressed: _onPause,
             tooltip: 'Pause',
           ),
         if (widget.task.phase == TaskPhase.TpDownPaused)

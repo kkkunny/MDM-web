@@ -12,3 +12,12 @@ Future<List<Task>> listTasks() async {
   final resp = ListTasksResponse.create()..mergeFromProto3Json(data);
   return resp.tasks;
 }
+
+Future<void> operateTasks(OperateTasksRequest req) async {
+  await request(
+    'POST',
+    '${getApiBaseUrl()}/api/task/operate',
+    contentType: 'application/json',
+    data: req.toProto3Json(),
+  );
+}

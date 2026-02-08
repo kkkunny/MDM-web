@@ -21,7 +21,7 @@ Future<T> request<T>(
   (bool, dynamic) Function(Response<dynamic>)? respHandler,
   String? contentType,
   Map<String, dynamic>? headers,
-  Object? body,
+  Object? data,
 }) async {
   final response = await client.request(
     url,
@@ -31,7 +31,7 @@ Future<T> request<T>(
       headers: headers,
     ),
     queryParameters: queries,
-    data: body,
+    data: data,
   );
   if (response.statusCode != 200) {
     throw Exception(

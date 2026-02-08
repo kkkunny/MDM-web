@@ -4,7 +4,7 @@ extension TaskPhaseExtension on TaskPhase {
   String get label {
     switch (this) {
       case TaskPhase.TpDownWaiting:
-        return '准备中';
+        return '等待中';
       case TaskPhase.TpDownRunning:
         return '下载中';
       case TaskPhase.TpDownPaused:
