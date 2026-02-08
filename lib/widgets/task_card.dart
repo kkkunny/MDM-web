@@ -14,7 +14,6 @@ class TaskCard extends StatefulWidget {
   final Task task;
   final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onResume;
   final VoidCallback onDelete;
   final VoidCallback onRetry;
 
@@ -23,7 +22,6 @@ class TaskCard extends StatefulWidget {
     required this.task,
     required this.isSelected,
     required this.onTap,
-    required this.onResume,
     required this.onDelete,
     required this.onRetry,
   });
@@ -258,6 +256,10 @@ class _TaskCardState extends State<TaskCard>
     operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpPause));
   }
 
+  void _onResume(){
+    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpResume));
+  }
+
   Widget _buildActionButtons(Color statusColor) {
     return Row(
       children: [
@@ -272,7 +274,7 @@ class _TaskCardState extends State<TaskCard>
           _buildIconButton(
             icon: Icons.play_arrow_rounded,
             color: AppColors.info,
-            onPressed: widget.onResume,
+            onPressed: _onResume,
             tooltip: 'Resume',
           ),
         if (widget.task.phase == TaskPhase.TpDownFailed)
