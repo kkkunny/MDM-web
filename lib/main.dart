@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/providers/theme_provider.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
-          return MaterialApp(
+          return GetMaterialApp(
             title: 'Download Manager',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
