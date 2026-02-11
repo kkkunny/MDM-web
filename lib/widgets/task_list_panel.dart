@@ -285,7 +285,6 @@ class TaskListPanel extends StatelessWidget {
                 task: task,
                 isSelected: provider.selectedTaskIds.contains(task.id),
                 onTap: () => provider.toggleSelection(task.id),
-                onRetry: () => provider.retryTask(task.id),
               ),
             );
           },

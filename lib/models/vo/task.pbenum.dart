@@ -55,16 +55,18 @@ class Operate extends $pb.ProtobufEnum {
   static const Operate OpResume =
       Operate._(2, _omitEnumNames ? '' : 'OpResume');
   static const Operate OpPause = Operate._(3, _omitEnumNames ? '' : 'OpPause');
+  static const Operate OpRetry = Operate._(4, _omitEnumNames ? '' : 'OpRetry');
 
   static const $core.List<Operate> values = <Operate>[
     OpUnknown,
     OpDelete,
     OpResume,
     OpPause,
+    OpRetry,
   ];
 
   static final $core.List<Operate?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 3);
+      $pb.ProtobufEnum.$_initByValueList(values, 4);
   static Operate? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

@@ -41,13 +41,14 @@ const Operate$json = {
     {'1': 'OpDelete', '2': 1},
     {'1': 'OpResume', '2': 2},
     {'1': 'OpPause', '2': 3},
+    {'1': 'OpRetry', '2': 4},
   ],
 };
 
 /// Descriptor for `Operate`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List operateDescriptor = $convert.base64Decode(
     'CgdPcGVyYXRlEg0KCU9wVW5rbm93bhAAEgwKCE9wRGVsZXRlEAESDAoIT3BSZXN1bWUQAhILCg'
-    'dPcFBhdXNlEAM=');
+    'dPcFBhdXNlEAMSCwoHT3BSZXRyeRAE');
 
 @$core.Deprecated('Use taskDescriptor instead')
 const Task$json = {

@@ -14,14 +14,12 @@ class TaskCard extends StatefulWidget {
   final Task task;
   final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onRetry;
 
   const TaskCard({
     super.key,
     required this.task,
     required this.isSelected,
     required this.onTap,
-    required this.onRetry,
   });
 
   @override
@@ -262,6 +260,10 @@ class _TaskCardState extends State<TaskCard>
     operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpDelete));
   }
 
+  void _onRetry(){
+    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpRetry));
+  }
+
   Widget _buildActionButtons(Color statusColor) {
     return Row(
       children: [
@@ -283,7 +285,7 @@ class _TaskCardState extends State<TaskCard>
           _buildIconButton(
             icon: Icons.refresh_rounded,
             color: AppColors.primary,
-            onPressed: widget.onRetry,
+            onPressed: _onRetry,
             tooltip: 'Retry',
           ),
         const SizedBox(width: 8),
