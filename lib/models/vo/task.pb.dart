@@ -31,6 +31,7 @@ class Task extends $pb.GeneratedMessage {
     Category? category,
     $fixnum.Int64? createdAt,
     DownloadStats? downloadStats,
+    UploadStats? uploadStats,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -40,6 +41,7 @@ class Task extends $pb.GeneratedMessage {
     if (category != null) result.category = category;
     if (createdAt != null) result.createdAt = createdAt;
     if (downloadStats != null) result.downloadStats = downloadStats;
+    if (uploadStats != null) result.uploadStats = uploadStats;
     return result;
   }
 
@@ -71,6 +73,8 @@ class Task extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOM<DownloadStats>(50, _omitFieldNames ? '' : 'downloadStats',
         subBuilder: DownloadStats.create)
+    ..aOM<UploadStats>(51, _omitFieldNames ? '' : 'uploadStats',
+        subBuilder: UploadStats.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -158,6 +162,17 @@ class Task extends $pb.GeneratedMessage {
   void clearDownloadStats() => $_clearField(50);
   @$pb.TagNumber(50)
   DownloadStats ensureDownloadStats() => $_ensure(6);
+
+  @$pb.TagNumber(51)
+  UploadStats get uploadStats => $_getN(7);
+  @$pb.TagNumber(51)
+  set uploadStats(UploadStats value) => $_setField(51, value);
+  @$pb.TagNumber(51)
+  $core.bool hasUploadStats() => $_has(7);
+  @$pb.TagNumber(51)
+  void clearUploadStats() => $_clearField(51);
+  @$pb.TagNumber(51)
+  UploadStats ensureUploadStats() => $_ensure(7);
 }
 
 /// 类别
@@ -231,11 +246,11 @@ class Category extends $pb.GeneratedMessage {
 class DownloadStats extends $pb.GeneratedMessage {
   factory DownloadStats({
     $fixnum.Int64? speed,
-    $fixnum.Int64? progress,
+    $fixnum.Int64? size,
   }) {
     final result = create();
     if (speed != null) result.speed = speed;
-    if (progress != null) result.progress = progress;
+    if (size != null) result.size = size;
     return result;
   }
 
@@ -254,8 +269,7 @@ class DownloadStats extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'speed', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
-    ..a<$fixnum.Int64>(
-        2, _omitFieldNames ? '' : 'progress', $pb.PbFieldType.OU6,
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'size', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
@@ -290,13 +304,83 @@ class DownloadStats extends $pb.GeneratedMessage {
   void clearSpeed() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $fixnum.Int64 get progress => $_getI64(1);
+  $fixnum.Int64 get size => $_getI64(1);
   @$pb.TagNumber(2)
-  set progress($fixnum.Int64 value) => $_setInt64(1, value);
+  set size($fixnum.Int64 value) => $_setInt64(1, value);
   @$pb.TagNumber(2)
-  $core.bool hasProgress() => $_has(1);
+  $core.bool hasSize() => $_has(1);
   @$pb.TagNumber(2)
-  void clearProgress() => $_clearField(2);
+  void clearSize() => $_clearField(2);
+}
+
+/// 上传状态
+class UploadStats extends $pb.GeneratedMessage {
+  factory UploadStats({
+    $fixnum.Int64? speed,
+    $fixnum.Int64? size,
+  }) {
+    final result = create();
+    if (speed != null) result.speed = speed;
+    if (size != null) result.size = size;
+    return result;
+  }
+
+  UploadStats._();
+
+  factory UploadStats.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory UploadStats.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'UploadStats',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'task'),
+      createEmptyInstance: create)
+    ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'speed', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'size', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadStats clone() => UploadStats()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  UploadStats copyWith(void Function(UploadStats) updates) =>
+      super.copyWith((message) => updates(message as UploadStats))
+          as UploadStats;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static UploadStats create() => UploadStats._();
+  @$core.override
+  UploadStats createEmptyInstance() => create();
+  static $pb.PbList<UploadStats> createRepeated() => [] as $pb.PbList<UploadStats>;
+  @$core.pragma('dart2js:noInline')
+  static UploadStats getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<UploadStats>(create);
+  static UploadStats? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get speed => $_getI64(0);
+  @$pb.TagNumber(1)
+  set speed($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSpeed() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSpeed() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get size => $_getI64(1);
+  @$pb.TagNumber(2)
+  set size($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasSize() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSize() => $_clearField(2);
 }
 
 class ListTasksRequest extends $pb.GeneratedMessage {

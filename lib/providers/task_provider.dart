@@ -41,7 +41,7 @@ class TaskProvider extends ChangeNotifier {
             .where(
               (t) =>
                   t.phase == TaskPhase.TpDownRunning ||
-                  t.phase == TaskPhase.TpDownWaiting,
+                  t.phase == TaskPhase.TpDownQueued,
             )
             .toList();
         break;

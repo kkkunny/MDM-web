@@ -3,16 +3,26 @@ import 'package:mdm/models/vo/task.pb.dart';
 extension TaskPhaseExtension on TaskPhase {
   String get label {
     switch (this) {
-      case TaskPhase.TpDownWaiting:
-        return '等待中';
+      case TaskPhase.TpDownQueued:
+        return '等待下载';
       case TaskPhase.TpDownRunning:
         return '下载中';
       case TaskPhase.TpDownPaused:
-        return '已暂停';
+        return '暂停下载';
       case TaskPhase.TpDownFailed:
-        return '已失败';
+        return '下载失败';
       case TaskPhase.TpDownCompleted:
-        return '已完成';
+        return '下载完成';
+      case TaskPhase.TpUpQueued:
+        return '等待上传';
+      case TaskPhase.TpUpRunning:
+        return '上传中';
+      case TaskPhase.TpUpPaused:
+        return '暂停上传';
+      case TaskPhase.TpUpFailed:
+        return '上传失败';
+      case TaskPhase.TpUpCompleted:
+        return '上传完成';
       default:
         return 'Unknown';
     }
@@ -49,12 +59,12 @@ class DownloadStats {
       totalTasks: tasks.length,
       downloading: tasks.where((t) => t.phase == TaskPhase.TpDownRunning).length,
       completed: tasks.where((t) => t.phase == TaskPhase.TpDownCompleted).length,
-      paused: tasks.where((t) => t.phase == TaskPhase.TpDownWaiting).length,
+      paused: tasks.where((t) => t.phase == TaskPhase.TpDownQueued).length,
       failed: tasks.where((t) => t.phase == TaskPhase.TpDownFailed).length,
       totalSpeed: tasks
           .where((t) => t.phase == TaskPhase.TpDownRunning)
           .fold(0, (sum, t) => sum + t.downloadStats.speed.toInt()),
-      totalDownloaded: tasks.fold(0, (sum, t) => sum + t.downloadStats.progress.toInt()),
+      totalDownloaded: tasks.fold(0, (sum, t) => sum + t.downloadStats.size.toInt()),
       totalSize: tasks.fold(0, (sum, t) => sum + t.size.toInt()),
     );
   }

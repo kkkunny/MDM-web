@@ -18,30 +18,44 @@ import 'package:protobuf/protobuf.dart' as $pb;
 class TaskPhase extends $pb.ProtobufEnum {
   static const TaskPhase TpUnknown =
       TaskPhase._(0, _omitEnumNames ? '' : 'TpUnknown');
-  static const TaskPhase TpDownWaiting =
-      TaskPhase._(1, _omitEnumNames ? '' : 'TpDownWaiting');
+  static const TaskPhase TpDownQueued =
+      TaskPhase._(51, _omitEnumNames ? '' : 'TpDownQueued');
   static const TaskPhase TpDownRunning =
-      TaskPhase._(2, _omitEnumNames ? '' : 'TpDownRunning');
+      TaskPhase._(52, _omitEnumNames ? '' : 'TpDownRunning');
   static const TaskPhase TpDownPaused =
-      TaskPhase._(3, _omitEnumNames ? '' : 'TpDownPaused');
+      TaskPhase._(53, _omitEnumNames ? '' : 'TpDownPaused');
   static const TaskPhase TpDownFailed =
-      TaskPhase._(4, _omitEnumNames ? '' : 'TpDownFailed');
+      TaskPhase._(54, _omitEnumNames ? '' : 'TpDownFailed');
   static const TaskPhase TpDownCompleted =
-      TaskPhase._(5, _omitEnumNames ? '' : 'TpDownCompleted');
+      TaskPhase._(55, _omitEnumNames ? '' : 'TpDownCompleted');
+  static const TaskPhase TpUpQueued =
+      TaskPhase._(101, _omitEnumNames ? '' : 'TpUpQueued');
+  static const TaskPhase TpUpRunning =
+      TaskPhase._(102, _omitEnumNames ? '' : 'TpUpRunning');
+  static const TaskPhase TpUpPaused =
+      TaskPhase._(103, _omitEnumNames ? '' : 'TpUpPaused');
+  static const TaskPhase TpUpFailed =
+      TaskPhase._(104, _omitEnumNames ? '' : 'TpUpFailed');
+  static const TaskPhase TpUpCompleted =
+      TaskPhase._(105, _omitEnumNames ? '' : 'TpUpCompleted');
 
   static const $core.List<TaskPhase> values = <TaskPhase>[
     TpUnknown,
-    TpDownWaiting,
+    TpDownQueued,
     TpDownRunning,
     TpDownPaused,
     TpDownFailed,
     TpDownCompleted,
+    TpUpQueued,
+    TpUpRunning,
+    TpUpPaused,
+    TpUpFailed,
+    TpUpCompleted,
   ];
 
-  static final $core.List<TaskPhase?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 5);
-  static TaskPhase? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.Map<$core.int, TaskPhase> _byValue =
+      $pb.ProtobufEnum.initByValue(values);
+  static TaskPhase? valueOf($core.int value) => _byValue[value];
 
   const TaskPhase._(super.value, super.name);
 }

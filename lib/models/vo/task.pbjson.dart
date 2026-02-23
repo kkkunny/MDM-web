@@ -19,19 +19,25 @@ const TaskPhase$json = {
   '1': 'TaskPhase',
   '2': [
     {'1': 'TpUnknown', '2': 0},
-    {'1': 'TpDownWaiting', '2': 1},
-    {'1': 'TpDownRunning', '2': 2},
-    {'1': 'TpDownPaused', '2': 3},
-    {'1': 'TpDownFailed', '2': 4},
-    {'1': 'TpDownCompleted', '2': 5},
+    {'1': 'TpDownQueued', '2': 51},
+    {'1': 'TpDownRunning', '2': 52},
+    {'1': 'TpDownPaused', '2': 53},
+    {'1': 'TpDownFailed', '2': 54},
+    {'1': 'TpDownCompleted', '2': 55},
+    {'1': 'TpUpQueued', '2': 101},
+    {'1': 'TpUpRunning', '2': 102},
+    {'1': 'TpUpPaused', '2': 103},
+    {'1': 'TpUpFailed', '2': 104},
+    {'1': 'TpUpCompleted', '2': 105},
   ],
 };
 
 /// Descriptor for `TaskPhase`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List taskPhaseDescriptor = $convert.base64Decode(
-    'CglUYXNrUGhhc2USDQoJVHBVbmtub3duEAASEQoNVHBEb3duV2FpdGluZxABEhEKDVRwRG93bl'
-    'J1bm5pbmcQAhIQCgxUcERvd25QYXVzZWQQAxIQCgxUcERvd25GYWlsZWQQBBITCg9UcERvd25D'
-    'b21wbGV0ZWQQBQ==');
+    'CglUYXNrUGhhc2USDQoJVHBVbmtub3duEAASEAoMVHBEb3duUXVldWVkEDMSEQoNVHBEb3duUn'
+    'VubmluZxA0EhAKDFRwRG93blBhdXNlZBA1EhAKDFRwRG93bkZhaWxlZBA2EhMKD1RwRG93bkNv'
+    'bXBsZXRlZBA3Eg4KClRwVXBRdWV1ZWQQZRIPCgtUcFVwUnVubmluZxBmEg4KClRwVXBQYXVzZW'
+    'QQZxIOCgpUcFVwRmFpbGVkEGgSEQoNVHBVcENvbXBsZXRlZBBp');
 
 @$core.Deprecated('Use operateDescriptor instead')
 const Operate$json = {
@@ -86,10 +92,21 @@ const Task$json = {
       '10': 'downloadStats',
       '17': true
     },
+    {
+      '1': 'upload_stats',
+      '3': 51,
+      '4': 1,
+      '5': 11,
+      '6': '.task.UploadStats',
+      '9': 2,
+      '10': 'uploadStats',
+      '17': true
+    },
   ],
   '8': [
     {'1': '_category'},
     {'1': '_download_stats'},
+    {'1': '_upload_stats'},
   ],
 };
 
@@ -99,8 +116,9 @@ final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
     'gOMg8udGFzay5UYXNrUGhhc2VSBXBoYXNlEhIKBHNpemUYBCABKARSBHNpemUSLwoIY2F0ZWdv'
     'cnkYBSABKAsyDi50YXNrLkNhdGVnb3J5SABSCGNhdGVnb3J5iAEBEh0KCmNyZWF0ZWRfYXQYBi'
     'ABKARSCWNyZWF0ZWRBdBI/Cg5kb3dubG9hZF9zdGF0cxgyIAEoCzITLnRhc2suRG93bmxvYWRT'
-    'dGF0c0gBUg1kb3dubG9hZFN0YXRziAEBQgsKCV9jYXRlZ29yeUIRCg9fZG93bmxvYWRfc3RhdH'
-    'M=');
+    'dGF0c0gBUg1kb3dubG9hZFN0YXRziAEBEjkKDHVwbG9hZF9zdGF0cxgzIAEoCzIRLnRhc2suVX'
+    'Bsb2FkU3RhdHNIAlILdXBsb2FkU3RhdHOIAQFCCwoJX2NhdGVnb3J5QhEKD19kb3dubG9hZF9z'
+    'dGF0c0IPCg1fdXBsb2FkX3N0YXRz');
 
 @$core.Deprecated('Use categoryDescriptor instead')
 const Category$json = {
@@ -120,14 +138,28 @@ const DownloadStats$json = {
   '1': 'DownloadStats',
   '2': [
     {'1': 'speed', '3': 1, '4': 1, '5': 4, '10': 'speed'},
-    {'1': 'progress', '3': 2, '4': 1, '5': 4, '10': 'progress'},
+    {'1': 'size', '3': 2, '4': 1, '5': 4, '10': 'size'},
   ],
 };
 
 /// Descriptor for `DownloadStats`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List downloadStatsDescriptor = $convert.base64Decode(
-    'Cg1Eb3dubG9hZFN0YXRzEhQKBXNwZWVkGAEgASgEUgVzcGVlZBIaCghwcm9ncmVzcxgCIAEoBF'
-    'IIcHJvZ3Jlc3M=');
+    'Cg1Eb3dubG9hZFN0YXRzEhQKBXNwZWVkGAEgASgEUgVzcGVlZBISCgRzaXplGAIgASgEUgRzaX'
+    'pl');
+
+@$core.Deprecated('Use uploadStatsDescriptor instead')
+const UploadStats$json = {
+  '1': 'UploadStats',
+  '2': [
+    {'1': 'speed', '3': 1, '4': 1, '5': 4, '10': 'speed'},
+    {'1': 'size', '3': 2, '4': 1, '5': 4, '10': 'size'},
+  ],
+};
+
+/// Descriptor for `UploadStats`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List uploadStatsDescriptor = $convert.base64Decode(
+    'CgtVcGxvYWRTdGF0cxIUCgVzcGVlZBgBIAEoBFIFc3BlZWQSEgoEc2l6ZRgCIAEoBFIEc2l6ZQ'
+    '==');
 
 @$core.Deprecated('Use listTasksRequestDescriptor instead')
 const ListTasksRequest$json = {

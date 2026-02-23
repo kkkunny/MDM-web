@@ -20,8 +20,8 @@ class DownloadService {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: fileName ?? 'new_file.zip',
       size: Int64(1024 * 1024 * 100),
-      downloadStats: DownloadStats(speed: Int64(1), progress: Int64(0)),
-      phase: TaskPhase.TpDownWaiting,
+      downloadStats: DownloadStats(speed: Int64(1), size: Int64(0)),
+      phase: TaskPhase.TpDownQueued,
       createdAt: Int64(DateTime.now().second),
       category: Category(name: category ?? ''),
     );

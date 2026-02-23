@@ -267,7 +267,7 @@ class _TaskCardState extends State<TaskCard>
   Widget _buildActionButtons(Color statusColor) {
     return Row(
       children: [
-        if (widget.task.phase == TaskPhase.TpDownWaiting || widget.task.phase == TaskPhase.TpDownRunning)
+        if (widget.task.phase == TaskPhase.TpDownQueued || widget.task.phase == TaskPhase.TpDownRunning)
           _buildIconButton(
             icon: Icons.pause_rounded,
             color: AppColors.warning,
@@ -327,7 +327,7 @@ class _TaskCardState extends State<TaskCard>
   }
 
   Widget _buildProgressSection(Color statusColor, bool isDark) {
-    final progress = widget.task.downloadStats.progress;
+    final progress = widget.task.downloadStats.size;
     final total = widget.task.size;
 
     return Column(
@@ -398,7 +398,7 @@ class _TaskCardState extends State<TaskCard>
           Text(
             FormatHelper.formatDuration(
               widget.task.downloadStats.speed == 0 ? Duration.zero :
-                Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.progress.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
+                Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.size.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
             ),
             style: TextStyle(
               color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,

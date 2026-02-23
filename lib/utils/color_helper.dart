@@ -5,16 +5,26 @@ import 'package:mdm/models/vo/task.pb.dart';
 class ColorHelper {
   static Color getStatusColor(TaskPhase status) {
     switch (status) {
+      case TaskPhase.TpDownQueued:
+        return AppColors.neutral;
       case TaskPhase.TpDownRunning:
         return AppColors.info;
-      case TaskPhase.TpDownCompleted:
-        return AppColors.success;
       case TaskPhase.TpDownPaused:
         return AppColors.warning;
       case TaskPhase.TpDownFailed:
         return AppColors.error;
-      case TaskPhase.TpDownWaiting:
+      case TaskPhase.TpDownCompleted:
+        return AppColors.success;
+      case TaskPhase.TpUpQueued:
         return AppColors.neutral;
+      case TaskPhase.TpUpRunning:
+        return AppColors.info;
+      case TaskPhase.TpUpPaused:
+        return AppColors.warning;
+      case TaskPhase.TpUpFailed:
+        return AppColors.error;
+      case TaskPhase.TpUpCompleted:
+        return AppColors.success;
       default:
         return AppColors.neutral;
     }
