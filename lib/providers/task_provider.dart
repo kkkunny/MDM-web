@@ -6,7 +6,10 @@ import 'package:mdm/models/vo/task.pb.dart' hide DownloadStats;
 import '../models/task.dart';
 import '../services/download_service.dart';
 
-enum FilterType { downloading, completed, paused, failed }
+enum FilterType {
+  DL_running, DL_completed, DL_paused, DL_failed,
+  UL_running, UL_completed, UL_paused, UL_failed,
+}
 
 class TaskProvider extends ChangeNotifier {
   final DownloadService _service;
@@ -14,7 +17,7 @@ class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = [];
   bool _isLoading = false;
   String? _error;
-  FilterType _currentFilter = FilterType.downloading;
+  FilterType _currentFilter = FilterType.DL_running;
   String _searchQuery = '';
   Set<String> _selectedTaskIds = {};
   StreamSubscription? _streamSubscription;
@@ -44,7 +47,7 @@ class TaskProvider extends ChangeNotifier {
     var filtered = _tasks;
 
     switch (_currentFilter) {
-      case FilterType.downloading:
+      case FilterType.DL_running:
         filtered = filtered
             .where(
               (t) =>
@@ -53,19 +56,43 @@ class TaskProvider extends ChangeNotifier {
             )
             .toList();
         break;
-      case FilterType.completed:
+      case FilterType.DL_completed:
         filtered = filtered
             .where((t) => t.phase == TaskPhase.TpDownCompleted)
             .toList();
         break;
-      case FilterType.paused:
+      case FilterType.DL_paused:
         filtered = filtered
             .where((t) => t.phase == TaskPhase.TpDownPaused)
             .toList();
         break;
-      case FilterType.failed:
+      case FilterType.DL_failed:
         filtered = filtered
             .where((t) => t.phase == TaskPhase.TpDownFailed)
+            .toList();
+        break;
+      case FilterType.UL_running:
+        filtered = filtered
+            .where(
+              (t) =>
+          t.phase == TaskPhase.TpUpRunning ||
+              t.phase == TaskPhase.TpUpQueued,
+        )
+            .toList();
+        break;
+      case FilterType.UL_completed:
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpUpCompleted)
+            .toList();
+        break;
+      case FilterType.UL_paused:
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpUpPaused)
+            .toList();
+        break;
+      case FilterType.UL_failed:
+        filtered = filtered
+            .where((t) => t.phase == TaskPhase.TpUpFailed)
             .toList();
         break;
       }

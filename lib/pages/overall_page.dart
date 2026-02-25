@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/constants/colors.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/widgets/overview_panel.dart';
 import 'package:mdm/widgets/task_list_panel.dart';
@@ -24,15 +23,22 @@ class _OverallPageState extends State<OverallPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Color(0xFFF5F7FA),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 320.0, child: const OverviewPanel()),
+          const Expanded(
+            flex: 1,
+            child: OverviewPanel(),
+          ),
           Container(
             width: 1,
-            color: AppColors.lightDivider,
+            color: Color(0xFFF0F2F5),
           ),
-          const Expanded(child: TaskListPanel()),
+          const Expanded(
+            flex: 5,
+            child: TaskListPanel(),
+          ),
         ],
       ),
     );

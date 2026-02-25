@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/constants/strings.dart';
+import 'package:mdm/icons/iconfont.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
-import 'package:mdm/utils/icon_helper.dart';
 import 'package:provider/provider.dart';
 
 class OverviewPanel extends StatelessWidget {
@@ -13,20 +13,16 @@ class OverviewPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: ColorHelper.getSurfaceGradient(isDark: false),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSpeedCard(context),
-            const SizedBox(height: 20),
-            _buildFilterSection(context),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSpeedCard(context),
+          const SizedBox(height: 20),
+          _buildFilterSection(context),
+        ],
       ),
     );
   }
@@ -36,15 +32,15 @@ class OverviewPanel extends StatelessWidget {
       builder: (context, provider, _) {
         final stats = provider.stats;
         return Container(
-          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: ColorHelper.getPrimaryGradient(),
-            borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: AppStyles.blurRadiusMedium,
-                offset: const Offset(0, AppStyles.shadowOffsetLarge),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -55,10 +51,10 @@ class OverviewPanel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    AppStrings.downloadSpeed,
+                    '下载速度',
                     style: TextStyle(
-                      color: AppColors.white70,
-                      fontSize: AppStyles.fontSizeMedium,
+                      color: Colors.white70,
+                      fontSize: 14,
                     ),
                   ),
                   Container(
@@ -85,11 +81,11 @@ class OverviewPanel extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           stats.downloading > 0
-                              ? AppStrings.active
-                              : AppStrings.idle,
+                              ? '已连接'
+                              : '已断联',
                           style: const TextStyle(
                             color: AppColors.white,
-                            fontSize: AppStyles.fontSizeSmall,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -105,7 +101,7 @@ class OverviewPanel extends StatelessWidget {
                     FormatHelper.formatSpeed(stats.totalSpeed.toDouble()),
                     style: const TextStyle(
                       color: AppColors.white,
-                      fontSize: AppStyles.fontSizeXXXLarge,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -115,7 +111,7 @@ class OverviewPanel extends StatelessWidget {
                       AppStrings.perSecond,
                       style: TextStyle(
                         color: AppColors.white70,
-                        fontSize: AppStyles.fontSizeLarge,
+                        fontSize: 16,
                       ),
                     ),
                   ),
@@ -123,7 +119,7 @@ class OverviewPanel extends StatelessWidget {
               ),
               const SizedBox(height: AppStyles.spacingLarge),
               LinearProgressIndicator(
-                minHeight: AppStyles.progressHeightSmall,
+                minHeight: 6,
                 borderRadius: BorderRadius.circular(8),
                 value: stats.totalSize > 0
                     ? stats.totalDownloaded / stats.totalSize
@@ -139,14 +135,14 @@ class OverviewPanel extends StatelessWidget {
                     FormatHelper.formatSize(stats.totalDownloaded),
                     style: TextStyle(
                       color: AppColors.white60,
-                      fontSize: AppStyles.fontSizeSmall,
+                      fontSize: 12,
                     ),
                   ),
                   Text(
                     FormatHelper.formatSize(stats.totalSize),
                     style: TextStyle(
                       color: AppColors.white60,
-                      fontSize: AppStyles.fontSizeSmall,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -164,17 +160,22 @@ class OverviewPanel extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              AppStrings.quickFilter,
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: AppStyles.fontSizeLarge,
-                fontWeight: FontWeight.w600,
-              ),
+            ExpansionTile(
+              initiallyExpanded: true,
+              leading: Icon(Icons.download_rounded),
+              title: Text('下载任务'),
+              children: FilterType.values.getRange(0, 4).map(
+                    (filter) => _buildFilterItem(context, filter, provider),
+              ).toList(),
             ),
-            const SizedBox(height: AppStyles.paddingMedium),
-            ...FilterType.values.map(
-              (filter) => _buildFilterItem(context, filter, provider),
+            const SizedBox(height: 12),
+            ExpansionTile(
+              initiallyExpanded: true,
+              leading: Icon(Icons.upload_rounded),
+              title: Text('上传任务'),
+              children: FilterType.values.skip(4).map(
+                    (filter) => _buildFilterItem(context, filter, provider),
+              ).toList(),
             ),
           ],
         );
@@ -182,42 +183,45 @@ class OverviewPanel extends StatelessWidget {
     );
   }
 
-  static IconData getFilterIcon(FilterType filter) {
+  static Icon getFilterIcon(FilterType filter) {
     switch (filter) {
-      case FilterType.downloading:
-        return Icons.download_rounded;
-      case FilterType.completed:
-        return Icons.check_circle_rounded;
-      case FilterType.paused:
-        return Icons.pause_circle_rounded;
-      case FilterType.failed:
-        return Icons.error_rounded;
+      case FilterType.DL_running:
+        return const Icon(Icons.download_for_offline_rounded, color: AppColors.info, size: 20);
+      case FilterType.DL_completed:
+        return const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20);
+      case FilterType.DL_paused:
+        return const Icon(Icons.pause_circle_rounded, color: AppColors.warning, size: 20);
+      case FilterType.DL_failed:
+        return const Icon(Icons.pause_circle_rounded, color: AppColors.error, size: 20);
+      case FilterType.UL_running:
+        return const Icon(IconFont.upload, color: AppColors.info, size: 18);
+      case FilterType.UL_completed:
+        return const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20);
+      case FilterType.UL_paused:
+        return const Icon(Icons.pause_circle_rounded, color: AppColors.warning, size: 20);
+      case FilterType.UL_failed:
+        return const Icon(Icons.pause_circle_rounded, color: AppColors.error, size: 20);
     }
   }
 
   static String getFilterLabel(FilterType filter) {
     switch (filter) {
-      case FilterType.downloading:
-        return 'Downloading';
-      case FilterType.completed:
-        return 'Completed';
-      case FilterType.paused:
-        return 'Paused';
-      case FilterType.failed:
-        return 'Failed';
-    }
-  }
-
-  static Color getFilterColor(FilterType filter) {
-    switch (filter) {
-      case FilterType.downloading:
-        return AppColors.info;
-      case FilterType.completed:
-        return AppColors.success;
-      case FilterType.paused:
-        return AppColors.warning;
-      case FilterType.failed:
-        return AppColors.error;
+      case FilterType.DL_running:
+        return '下载中';
+      case FilterType.DL_completed:
+        return '已完成';
+      case FilterType.DL_paused:
+        return '暂停中';
+      case FilterType.DL_failed:
+        return '已失败';
+      case FilterType.UL_running:
+        return '上传中';
+      case FilterType.UL_completed:
+        return '已完成';
+      case FilterType.UL_paused:
+        return '暂停中';
+      case FilterType.UL_failed:
+        return '已失败';
     }
   }
 
@@ -229,7 +233,6 @@ class OverviewPanel extends StatelessWidget {
     final isSelected = provider.currentFilter == filter;
     final icon = getFilterIcon(filter);
     final label = getFilterLabel(filter);
-    final color = getFilterColor(filter);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppStyles.spacingSmall),
@@ -237,32 +240,32 @@ class OverviewPanel extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => provider.setFilter(filter),
-          borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+          borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
             duration: AppStyles.animationDurationMedium,
             padding: const EdgeInsets.symmetric(
               horizontal: AppStyles.paddingLarge,
-              vertical: AppStyles.paddingMedium,
+              vertical: 12,
             ),
             decoration: BoxDecoration(
               color: isSelected
-                  ? color.withValues(alpha: 0.15)
+                  ? icon.color!.withValues(alpha: 0.15)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
-                    ? color.withValues(alpha: 0.3)
+                    ? icon.color!.withValues(alpha: 0.3)
                     : Colors.transparent,
               ),
             ),
             child: Row(
               children: [
-                Icon(icon, color: color, size: AppStyles.iconSizeMedium),
-                const SizedBox(width: AppStyles.paddingMedium),
+                icon,
+                const SizedBox(width: 12),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? color : AppColors.white70,
+                    color: isSelected ? icon.color! : Colors.black54,
                     fontWeight: isSelected
                         ? FontWeight.w600
                         : FontWeight.normal,
@@ -272,8 +275,8 @@ class OverviewPanel extends StatelessWidget {
                 if (isSelected)
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: color,
-                    size: AppStyles.iconSizeMedium,
+                    color: icon.color!,
+                    size: 20,
                   ),
               ],
             ),
