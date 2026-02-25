@@ -4,11 +4,9 @@ import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/models/task.dart';
 import 'package:mdm/models/vo/task.pb.dart';
-import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
 import 'package:mdm/utils/icon_helper.dart';
-import 'package:provider/provider.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
@@ -53,8 +51,6 @@ class _TaskCardState extends State<TaskCard>
   @override
   Widget build(BuildContext context) {
     final statusColor = ColorHelper.getStatusColor(widget.task.phase);
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
 
     return MouseRegion(
       onEnter: (_) {
@@ -86,7 +82,7 @@ class _TaskCardState extends State<TaskCard>
                       : null,
                   color: widget.isSelected
                       ? null
-                      : (isDark ? AppColors.surface : AppColors.lightSurface),
+                      : AppColors.lightSurface,
                   borderRadius: BorderRadius.circular(
                     AppStyles.borderRadiusLarge,
                   ),
@@ -94,12 +90,8 @@ class _TaskCardState extends State<TaskCard>
                     color: widget.isSelected
                         ? AppColors.primary.withValues(alpha: 0.5)
                         : _isHovered
-                        ? (isDark
-                              ? AppColors.white.withValues(alpha: 0.2)
-                              : AppColors.lightDivider)
-                        : (isDark
-                              ? AppColors.white.withValues(alpha: 0.05)
-                              : AppColors.lightDivider),
+                        ? AppColors.lightDivider
+                        : AppColors.lightDivider,
                     width: widget.isSelected
                         ? AppStyles.borderWidthMedium
                         : AppStyles.borderWidthThin,
@@ -119,11 +111,11 @@ class _TaskCardState extends State<TaskCard>
                 ),
                 child: Column(
                   children: [
-                    _buildHeader(statusColor, isDark),
+                    _buildHeader(statusColor),
                     const SizedBox(height: AppStyles.spacingLarge),
-                    _buildProgressSection(statusColor, isDark),
+                    _buildProgressSection(statusColor),
                     const SizedBox(height: AppStyles.spacingLarge),
-                    _buildFooter(statusColor, isDark),
+                    _buildFooter(statusColor),
                   ],
                 ),
               ),
@@ -134,7 +126,7 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildHeader(Color statusColor, bool isDark) {
+  Widget _buildHeader(Color statusColor) {
     return Row(
       children: [
         _buildFileIcon(statusColor),
@@ -146,7 +138,7 @@ class _TaskCardState extends State<TaskCard>
               Text(
                 widget.task.name,
                 style: TextStyle(
-                  color: isDark ? AppColors.white : AppColors.lightText,
+                  color: AppColors.lightText,
                   fontSize: AppStyles.fontSizeLarge,
                   fontWeight: FontWeight.w600,
                 ),
@@ -159,7 +151,7 @@ class _TaskCardState extends State<TaskCard>
                   _buildStatusBadge(statusColor),
                   const SizedBox(width: 8),
                   if (widget.task.category.name.isNotEmpty)
-                    _buildCategoryBadge(isDark),
+                    _buildCategoryBadge(),
                 ],
               ),
             ],
@@ -229,19 +221,17 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildCategoryBadge(bool isDark) {
+  Widget _buildCategoryBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.white.withValues(alpha: 0.05)
-            : AppColors.lightSurfaceLight,
+        color: AppColors.lightSurfaceLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         widget.task.category.name,
         style: TextStyle(
-          color: isDark ? AppColors.white50 : AppColors.lightTextSecondary,
+          color: AppColors.lightTextSecondary,
           fontSize: AppStyles.fontSizeSmall,
         ),
       ),
@@ -326,7 +316,7 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildProgressSection(Color statusColor, bool isDark) {
+  Widget _buildProgressSection(Color statusColor) {
     final progress = widget.task.downloadStats.size;
     final total = widget.task.size;
 
@@ -336,9 +326,7 @@ class _TaskCardState extends State<TaskCard>
           minHeight: 8,
           borderRadius: BorderRadius.circular(6),
           value: progress.toDouble() / total.toDouble(),
-          backgroundColor: isDark
-            ? AppColors.white.withValues(alpha: 0.1)
-            : AppColors.lightDivider,
+          backgroundColor: AppColors.lightDivider,
           valueColor: widget.task.phase == TaskPhase.TpDownRunning ? AlwaysStoppedAnimation(AppColors.info): AlwaysStoppedAnimation(statusColor),
         ),
         const SizedBox(height: 12),
@@ -359,9 +347,7 @@ class _TaskCardState extends State<TaskCard>
             Text(
               '${FormatHelper.formatSize(progress.toInt())} / ${FormatHelper.formatSize(total.toInt())}',
               style: TextStyle(
-                color: isDark
-                    ? AppColors.white50
-                    : AppColors.lightTextSecondary,
+                color: AppColors.lightTextSecondary,
                 fontSize: 13,
               ),
             ),
@@ -371,27 +357,27 @@ class _TaskCardState extends State<TaskCard>
     );
   }
 
-  Widget _buildFooter(Color statusColor, bool isDark) {
+  Widget _buildFooter(Color statusColor) {
     return Row(
       children: [
         if (widget.task.phase == TaskPhase.TpDownRunning) ...[
           Icon(
             Icons.speed_rounded,
-            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
+            color: AppColors.lightTextSecondary,
             size: AppStyles.iconSizeSmall,
           ),
           const SizedBox(width: 6),
           Text(
             '${FormatHelper.formatSpeed(widget.task.downloadStats.speed.toDouble())}/s',
             style: TextStyle(
-              color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,
+              color: AppColors.lightTextSecondary,
               fontSize: 13,
             ),
           ),
           const SizedBox(width: 16),
           Icon(
             Icons.timer_outlined,
-            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
+            color: AppColors.lightTextSecondary,
             size: AppStyles.iconSizeSmall,
           ),
           const SizedBox(width: 6),
@@ -401,7 +387,7 @@ class _TaskCardState extends State<TaskCard>
                 Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.size.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
             ),
             style: TextStyle(
-              color: isDark ? AppColors.white60 : AppColors.lightTextSecondary,
+              color: AppColors.lightTextSecondary,
               fontSize: 13,
             ),
           ),
@@ -409,7 +395,7 @@ class _TaskCardState extends State<TaskCard>
         const Spacer(),
         Icon(
           Icons.access_time_rounded,
-          color: isDark ? AppColors.white30 : AppColors.lightTextSecondary,
+          color: AppColors.lightTextSecondary,
           size: 14,
         ),
         const SizedBox(width: 4),
@@ -420,7 +406,7 @@ class _TaskCardState extends State<TaskCard>
             ),
           ),
           style: TextStyle(
-            color: isDark ? AppColors.white40 : AppColors.lightTextSecondary,
+            color: AppColors.lightTextSecondary,
             fontSize: AppStyles.fontSizeSmall,
           ),
         ),

@@ -2,12 +2,11 @@ import 'package:mdm/configs/api.dart';
 import 'package:mdm/apis/mdm/client.dart';
 import 'package:mdm/models/vo/task.pb.dart';
 
-
-Future<ListTasksResponse> listTasks() async {
+Future<ListTasksResponse> listTasks({int page = 1, int count = 20}) async {
   final data = await request(
     'GET',
     '${getApiBaseUrl()}/api/task/list',
-    queries: {'page': 1, 'count': 20},
+    queries: {'page': page, 'count': count},
   );
   return ListTasksResponse.create()..mergeFromProto3Json(data);
 }

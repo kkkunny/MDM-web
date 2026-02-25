@@ -6,7 +6,7 @@ import 'package:mdm/models/vo/task.pb.dart' hide DownloadStats;
 import '../models/task.dart';
 import '../services/download_service.dart';
 
-enum FilterType { all, downloading, completed, paused, failed }
+enum FilterType { downloading, completed, paused, failed }
 
 class TaskProvider extends ChangeNotifier {
   final DownloadService _service;
@@ -14,10 +14,14 @@ class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = [];
   bool _isLoading = false;
   String? _error;
-  FilterType _currentFilter = FilterType.all;
+  FilterType _currentFilter = FilterType.downloading;
   String _searchQuery = '';
   Set<String> _selectedTaskIds = {};
   StreamSubscription? _streamSubscription;
+  int _currentPage = 1;
+  bool _hasMore = false;
+  bool _isLoadingMore = false;
+  static const int _pageSize = 20;
 
   TaskProvider({DownloadService? service})
     : _service = service ?? DownloadService();
@@ -29,6 +33,10 @@ class TaskProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   Set<String> get selectedTaskIds => _selectedTaskIds;
   bool get hasSelection => _selectedTaskIds.isNotEmpty;
+  int get currentPage => _currentPage;
+  bool get hasMore => _hasMore;
+  bool get isLoadingMore => _isLoadingMore;
+  bool get canLoadMore => _hasMore && !_isLoadingMore;
 
   DownloadStats get stats => DownloadStats.fromTasks(_tasks);
 
@@ -60,9 +68,7 @@ class TaskProvider extends ChangeNotifier {
             .where((t) => t.phase == TaskPhase.TpDownFailed)
             .toList();
         break;
-      case FilterType.all:
-        break;
-    }
+      }
 
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
@@ -83,10 +89,13 @@ class TaskProvider extends ChangeNotifier {
   Future<void> fetchTasks() async {
     _isLoading = true;
     _error = null;
+    _currentPage = 1;
     notifyListeners();
 
     try {
-      _tasks = (await listTasks()).tasks;
+      final response = await listTasks(page: 1, count: _pageSize);
+      _tasks = response.tasks;
+      _hasMore = response.hasMore;
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -96,15 +105,37 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> loadMore() async {
+    if (!_hasMore || _isLoadingMore) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final nextPage = _currentPage + 1;
+      final response = await listTasks(page: nextPage, count: _pageSize);
+      _tasks.addAll(response.tasks);
+      _currentPage = nextPage;
+      _hasMore = response.hasMore;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoadingMore = false;
+      notifyListeners();
+    }
+  }
+
   void _startRealtimeUpdates() {
     _streamSubscription?.cancel();
     _streamSubscription =
         Stream.periodic(
           const Duration(seconds: AppStyles.refreshIntervalSeconds),
-          (_) async => await listTasks(),
+          (_) => listTasks(page: _currentPage, count: _pageSize),
         ).listen(
-          (resp) async {
-            _tasks = (await resp).tasks;
+          (futureResp) async {
+            final resp = await futureResp;
+            _tasks = resp.tasks;
+            _hasMore = resp.hasMore;
             notifyListeners();
           },
           onError: (e) {
@@ -189,12 +220,14 @@ class TaskProvider extends ChangeNotifier {
 
   void setFilter(FilterType filter) {
     _currentFilter = filter;
-    notifyListeners();
+    _currentPage = 1;
+    fetchTasks();
   }
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    notifyListeners();
+    _currentPage = 1;
+    fetchTasks();
   }
 
   void toggleSelection(String taskId) {

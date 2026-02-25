@@ -3,7 +3,6 @@ import 'package:mdm/constants/colors.dart';
 import 'package:mdm/constants/styles.dart';
 import 'package:mdm/constants/strings.dart';
 import 'package:mdm/providers/task_provider.dart';
-import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
 import 'package:mdm/utils/icon_helper.dart';
@@ -19,14 +18,12 @@ class OverviewPanel extends StatelessWidget {
         gradient: ColorHelper.getSurfaceGradient(isDark: false),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSpeedCard(context),
-            const SizedBox(height: AppStyles.spacingXLarge),
-            _buildStatsGrid(context),
-            const SizedBox(height: AppStyles.spacingXLarge),
+            const SizedBox(height: 20),
             _buildFilterSection(context),
           ],
         ),
@@ -161,110 +158,6 @@ class OverviewPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid(BuildContext context) {
-    return Consumer<TaskProvider>(
-      builder: (context, provider, _) {
-        final stats = provider.stats;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              AppStrings.statistics,
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: AppStyles.fontSizeLarge,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppStyles.paddingMedium),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.download_rounded,
-                    label: AppStrings.downloading,
-                    value: '${stats.downloading}',
-                    color: AppColors.info,
-                  ),
-                ),
-                const SizedBox(width: AppStyles.paddingMedium),
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.check_circle_rounded,
-                    label: AppStrings.completed,
-                    value: '${stats.completed}',
-                    color: AppColors.success,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppStyles.paddingMedium),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.pause_circle_rounded,
-                    label: AppStrings.paused,
-                    value: '${stats.paused}',
-                    color: AppColors.warning,
-                  ),
-                ),
-                const SizedBox(width: AppStyles.paddingMedium),
-                Expanded(
-                  child: _buildStatItem(
-                    icon: Icons.error_rounded,
-                    label: AppStrings.failed,
-                    value: '${stats.failed}',
-                    color: AppColors.error,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(AppStyles.paddingLarge),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusLarge),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: AppStyles.iconSizeLarge),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: AppStyles.fontSizeXXLarge,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.white60,
-              fontSize: AppStyles.fontSizeSmall,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFilterSection(BuildContext context) {
     return Consumer<TaskProvider>(
       builder: (context, provider, _) {
@@ -289,15 +182,54 @@ class OverviewPanel extends StatelessWidget {
     );
   }
 
+  static IconData getFilterIcon(FilterType filter) {
+    switch (filter) {
+      case FilterType.downloading:
+        return Icons.download_rounded;
+      case FilterType.completed:
+        return Icons.check_circle_rounded;
+      case FilterType.paused:
+        return Icons.pause_circle_rounded;
+      case FilterType.failed:
+        return Icons.error_rounded;
+    }
+  }
+
+  static String getFilterLabel(FilterType filter) {
+    switch (filter) {
+      case FilterType.downloading:
+        return 'Downloading';
+      case FilterType.completed:
+        return 'Completed';
+      case FilterType.paused:
+        return 'Paused';
+      case FilterType.failed:
+        return 'Failed';
+    }
+  }
+
+  static Color getFilterColor(FilterType filter) {
+    switch (filter) {
+      case FilterType.downloading:
+        return AppColors.info;
+      case FilterType.completed:
+        return AppColors.success;
+      case FilterType.paused:
+        return AppColors.warning;
+      case FilterType.failed:
+        return AppColors.error;
+    }
+  }
+
   Widget _buildFilterItem(
     BuildContext context,
     FilterType filter,
     TaskProvider provider,
   ) {
     final isSelected = provider.currentFilter == filter;
-    final icon = IconHelper.getFilterIcon(filter);
-    final label = IconHelper.getFilterLabel(filter);
-    final color = IconHelper.getFilterColor(filter);
+    final icon = getFilterIcon(filter);
+    final label = getFilterLabel(filter);
+    final color = getFilterColor(filter);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppStyles.spacingSmall),

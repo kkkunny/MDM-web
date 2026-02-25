@@ -40,49 +40,4 @@ class IconHelper {
         return Icons.insert_drive_file_rounded;
     }
   }
-
-  static IconData getFilterIcon(FilterType filter) {
-    switch (filter) {
-      case FilterType.all:
-        return Icons.list_rounded;
-      case FilterType.downloading:
-        return Icons.download_rounded;
-      case FilterType.completed:
-        return Icons.check_circle_rounded;
-      case FilterType.paused:
-        return Icons.pause_circle_rounded;
-      case FilterType.failed:
-        return Icons.error_rounded;
-    }
-  }
-
-  static String getFilterLabel(FilterType filter) {
-    switch (filter) {
-      case FilterType.all:
-        return 'All Tasks';
-      case FilterType.downloading:
-        return 'Downloading';
-      case FilterType.completed:
-        return 'Completed';
-      case FilterType.paused:
-        return 'Paused';
-      case FilterType.failed:
-        return 'Failed';
-    }
-  }
-
-  static Color getFilterColor(FilterType filter) {
-    switch (filter) {
-      case FilterType.all:
-        return AppColors.white;
-      case FilterType.downloading:
-        return AppColors.info;
-      case FilterType.completed:
-        return AppColors.success;
-      case FilterType.paused:
-        return AppColors.warning;
-      case FilterType.failed:
-        return AppColors.error;
-    }
-  }
 }
