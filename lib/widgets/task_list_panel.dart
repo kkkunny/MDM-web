@@ -256,86 +256,24 @@ class TaskListPanel extends StatelessWidget {
           );
         }
 
-        return Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(AppStyles.paddingXLarge),
-                itemCount: provider.tasks.length,
-                itemBuilder: (context, index) {
-                  final task = provider.tasks[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: AppStyles.paddingMedium,
-                    ),
-                    child: TaskCard(
-                      task: task,
-                      isSelected: provider.selectedTaskIds.contains(task.id),
-                      onTap: () => provider.toggleSelection(task.id),
-                    ),
-                  );
-                },
+        return ListView.builder(
+          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+          itemCount: provider.tasks.length,
+          itemBuilder: (context, index) {
+            final task = provider.tasks[index];
+            return Padding(
+              padding: const EdgeInsets.only(
+                bottom: AppStyles.paddingMedium,
               ),
-            ),
-            _buildPaginationFooter(context, provider),
-          ],
+              child: TaskCard(
+                task: task,
+                isSelected: provider.selectedTaskIds.contains(task.id),
+                onTap: () => provider.toggleSelection(task.id),
+              ),
+            );
+          },
         );
       },
-    );
-  }
-
-  Widget _buildPaginationFooter(
-    BuildContext context,
-    TaskProvider provider,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(AppStyles.paddingLarge),
-      decoration: BoxDecoration(
-        color: AppColors.lightSurface,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.lightDivider,
-          ),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '第 ${provider.currentPage} 页',
-            style: TextStyle(
-              color: AppColors.lightTextSecondary,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(width: AppStyles.paddingLarge),
-          if (provider.isLoadingMore)
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.primary,
-              ),
-            )
-          else if (provider.hasMore)
-            TextButton(
-              onPressed: () => provider.loadMore(),
-              child: const Text(
-                '加载更多',
-                style: TextStyle(color: AppColors.primary),
-              ),
-            )
-          else if (provider.tasks.isNotEmpty)
-            Text(
-              '没有更多了',
-              style: TextStyle(
-                color: AppColors.lightTextSecondary,
-                fontSize: 13,
-              ),
-            ),
-        ],
-      ),
     );
   }
 

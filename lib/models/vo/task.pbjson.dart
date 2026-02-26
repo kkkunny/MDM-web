@@ -161,33 +161,17 @@ final $typed_data.Uint8List uploadStatsDescriptor = $convert.base64Decode(
     'CgtVcGxvYWRTdGF0cxIUCgVzcGVlZBgBIAEoBFIFc3BlZWQSEgoEc2l6ZRgCIAEoBFIEc2l6ZQ'
     '==');
 
-@$core.Deprecated('Use listTasksRequestDescriptor instead')
-const ListTasksRequest$json = {
-  '1': 'ListTasksRequest',
-  '2': [
-    {'1': 'page', '3': 1, '4': 1, '5': 13, '10': 'page'},
-    {'1': 'count', '3': 2, '4': 1, '5': 13, '10': 'count'},
-  ],
-};
-
-/// Descriptor for `ListTasksRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List listTasksRequestDescriptor = $convert.base64Decode(
-    'ChBMaXN0VGFza3NSZXF1ZXN0EhIKBHBhZ2UYASABKA1SBHBhZ2USFAoFY291bnQYAiABKA1SBW'
-    'NvdW50');
-
 @$core.Deprecated('Use listTasksResponseDescriptor instead')
 const ListTasksResponse$json = {
   '1': 'ListTasksResponse',
   '2': [
     {'1': 'tasks', '3': 1, '4': 3, '5': 11, '6': '.task.Task', '10': 'tasks'},
-    {'1': 'has_more', '3': 2, '4': 1, '5': 8, '10': 'hasMore'},
   ],
 };
 
 /// Descriptor for `ListTasksResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List listTasksResponseDescriptor = $convert.base64Decode(
-    'ChFMaXN0VGFza3NSZXNwb25zZRIgCgV0YXNrcxgBIAMoCzIKLnRhc2suVGFza1IFdGFza3MSGQ'
-    'oIaGFzX21vcmUYAiABKAhSB2hhc01vcmU=');
+    'ChFMaXN0VGFza3NSZXNwb25zZRIgCgV0YXNrcxgBIAMoCzIKLnRhc2suVGFza1IFdGFza3M=');
 
 @$core.Deprecated('Use createTaskRequestDescriptor instead')
 const CreateTaskRequest$json = {
@@ -247,3 +231,21 @@ const OperateTasksRequest$json = {
 final $typed_data.Uint8List operateTasksRequestDescriptor = $convert.base64Decode(
     'ChNPcGVyYXRlVGFza3NSZXF1ZXN0EhAKA2lkcxgBIAMoCVIDaWRzEicKB29wZXJhdGUYAiABKA'
     '4yDS50YXNrLk9wZXJhdGVSB29wZXJhdGU=');
+
+@$core.Deprecated('Use statInfoResponseDescriptor instead')
+const StatInfoResponse$json = {
+  '1': 'StatInfoResponse',
+  '2': [
+    {'1': 'task_count', '3': 1, '4': 1, '5': 4, '10': 'taskCount'},
+    {'1': 'dl_count', '3': 2, '4': 1, '5': 4, '10': 'dlCount'},
+    {'1': 'dl_speed', '3': 3, '4': 1, '5': 4, '10': 'dlSpeed'},
+    {'1': 'ul_count', '3': 4, '4': 1, '5': 4, '10': 'ulCount'},
+    {'1': 'ul_speed', '3': 5, '4': 1, '5': 4, '10': 'ulSpeed'},
+  ],
+};
+
+/// Descriptor for `StatInfoResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List statInfoResponseDescriptor = $convert.base64Decode(
+    'ChBTdGF0SW5mb1Jlc3BvbnNlEh0KCnRhc2tfY291bnQYASABKARSCXRhc2tDb3VudBIZCghkbF'
+    '9jb3VudBgCIAEoBFIHZGxDb3VudBIZCghkbF9zcGVlZBgDIAEoBFIHZGxTcGVlZBIZCgh1bF9j'
+    'b3VudBgEIAEoBFIHdWxDb3VudBIZCgh1bF9zcGVlZBgFIAEoBFIHdWxTcGVlZA==');

@@ -383,84 +383,12 @@ class UploadStats extends $pb.GeneratedMessage {
   void clearSize() => $_clearField(2);
 }
 
-class ListTasksRequest extends $pb.GeneratedMessage {
-  factory ListTasksRequest({
-    $core.int? page,
-    $core.int? count,
-  }) {
-    final result = create();
-    if (page != null) result.page = page;
-    if (count != null) result.count = count;
-    return result;
-  }
-
-  ListTasksRequest._();
-
-  factory ListTasksRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
-  factory ListTasksRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ListTasksRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'task'),
-      createEmptyInstance: create)
-    ..a<$core.int>(1, _omitFieldNames ? '' : 'page', $pb.PbFieldType.OU3)
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'count', $pb.PbFieldType.OU3)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ListTasksRequest clone() => ListTasksRequest()..mergeFromMessage(this);
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ListTasksRequest copyWith(void Function(ListTasksRequest) updates) =>
-      super.copyWith((message) => updates(message as ListTasksRequest))
-          as ListTasksRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static ListTasksRequest create() => ListTasksRequest._();
-  @$core.override
-  ListTasksRequest createEmptyInstance() => create();
-  static $pb.PbList<ListTasksRequest> createRepeated() =>
-      [] as $pb.PbList<ListTasksRequest>;
-  @$core.pragma('dart2js:noInline')
-  static ListTasksRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ListTasksRequest>(create);
-  static ListTasksRequest? _defaultInstance;
-
-  /// @gotags: query:"page"
-  @$pb.TagNumber(1)
-  $core.int get page => $_getIZ(0);
-  @$pb.TagNumber(1)
-  set page($core.int value) => $_setUnsignedInt32(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasPage() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearPage() => $_clearField(1);
-
-  /// @gotags: query:"count"
-  @$pb.TagNumber(2)
-  $core.int get count => $_getIZ(1);
-  @$pb.TagNumber(2)
-  set count($core.int value) => $_setUnsignedInt32(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasCount() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearCount() => $_clearField(2);
-}
-
 class ListTasksResponse extends $pb.GeneratedMessage {
   factory ListTasksResponse({
     $core.Iterable<Task>? tasks,
-    $core.bool? hasMore,
   }) {
     final result = create();
     if (tasks != null) result.tasks.addAll(tasks);
-    if (hasMore != null) result.hasMore = hasMore;
     return result;
   }
 
@@ -479,7 +407,6 @@ class ListTasksResponse extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..pc<Task>(1, _omitFieldNames ? '' : 'tasks', $pb.PbFieldType.PM,
         subBuilder: Task.create)
-    ..aOB(2, _omitFieldNames ? '' : 'hasMore')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -505,15 +432,6 @@ class ListTasksResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(1)
   $pb.PbList<Task> get tasks => $_getList(0);
-
-  @$pb.TagNumber(2)
-  $core.bool get hasMore => $_getBF(1);
-  @$pb.TagNumber(2)
-  set hasMore($core.bool value) => $_setBool(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasHasMore() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearHasMore() => $_clearField(2);
 }
 
 class CreateTaskRequest extends $pb.GeneratedMessage {
@@ -715,6 +633,116 @@ class OperateTasksRequest extends $pb.GeneratedMessage {
   $core.bool hasOperate() => $_has(1);
   @$pb.TagNumber(2)
   void clearOperate() => $_clearField(2);
+}
+
+class StatInfoResponse extends $pb.GeneratedMessage {
+  factory StatInfoResponse({
+    $fixnum.Int64? taskCount,
+    $fixnum.Int64? dlCount,
+    $fixnum.Int64? dlSpeed,
+    $fixnum.Int64? ulCount,
+    $fixnum.Int64? ulSpeed,
+  }) {
+    final result = create();
+    if (taskCount != null) result.taskCount = taskCount;
+    if (dlCount != null) result.dlCount = dlCount;
+    if (dlSpeed != null) result.dlSpeed = dlSpeed;
+    if (ulCount != null) result.ulCount = ulCount;
+    if (ulSpeed != null) result.ulSpeed = ulSpeed;
+    return result;
+  }
+
+  StatInfoResponse._();
+
+  factory StatInfoResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory StatInfoResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'StatInfoResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'task'),
+      createEmptyInstance: create)
+    ..a<$fixnum.Int64>(
+        1, _omitFieldNames ? '' : 'taskCount', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'dlCount', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'dlSpeed', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(4, _omitFieldNames ? '' : 'ulCount', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(5, _omitFieldNames ? '' : 'ulSpeed', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  StatInfoResponse clone() => StatInfoResponse()..mergeFromMessage(this);
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  StatInfoResponse copyWith(void Function(StatInfoResponse) updates) =>
+      super.copyWith((message) => updates(message as StatInfoResponse))
+          as StatInfoResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static StatInfoResponse create() => StatInfoResponse._();
+  @$core.override
+  StatInfoResponse createEmptyInstance() => create();
+  static $pb.PbList<StatInfoResponse> createRepeated() =>
+      [] as $pb.PbList<StatInfoResponse>;
+  @$core.pragma('dart2js:noInline')
+  static StatInfoResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<StatInfoResponse>(create);
+  static StatInfoResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get taskCount => $_getI64(0);
+  @$pb.TagNumber(1)
+  set taskCount($fixnum.Int64 value) => $_setInt64(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasTaskCount() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTaskCount() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get dlCount => $_getI64(1);
+  @$pb.TagNumber(2)
+  set dlCount($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDlCount() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDlCount() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get dlSpeed => $_getI64(2);
+  @$pb.TagNumber(3)
+  set dlSpeed($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasDlSpeed() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDlSpeed() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get ulCount => $_getI64(3);
+  @$pb.TagNumber(4)
+  set ulCount($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasUlCount() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearUlCount() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get ulSpeed => $_getI64(4);
+  @$pb.TagNumber(5)
+  set ulSpeed($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasUlSpeed() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearUlSpeed() => $_clearField(5);
 }
 
 const $core.bool _omitFieldNames =

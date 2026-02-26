@@ -7,8 +7,14 @@ import '../models/task.dart';
 import '../services/download_service.dart';
 
 enum FilterType {
-  DL_running, DL_completed, DL_paused, DL_failed,
-  UL_running, UL_completed, UL_paused, UL_failed,
+  DL_running,
+  DL_completed,
+  DL_paused,
+  DL_failed,
+  UL_running,
+  UL_completed,
+  UL_paused,
+  UL_failed,
 }
 
 class TaskProvider extends ChangeNotifier {
@@ -21,10 +27,6 @@ class TaskProvider extends ChangeNotifier {
   String _searchQuery = '';
   Set<String> _selectedTaskIds = {};
   StreamSubscription? _streamSubscription;
-  int _currentPage = 1;
-  bool _hasMore = false;
-  bool _isLoadingMore = false;
-  static const int _pageSize = 20;
 
   TaskProvider({DownloadService? service})
     : _service = service ?? DownloadService();
@@ -36,10 +38,6 @@ class TaskProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   Set<String> get selectedTaskIds => _selectedTaskIds;
   bool get hasSelection => _selectedTaskIds.isNotEmpty;
-  int get currentPage => _currentPage;
-  bool get hasMore => _hasMore;
-  bool get isLoadingMore => _isLoadingMore;
-  bool get canLoadMore => _hasMore && !_isLoadingMore;
 
   DownloadStats get stats => DownloadStats.fromTasks(_tasks);
 
@@ -75,9 +73,9 @@ class TaskProvider extends ChangeNotifier {
         filtered = filtered
             .where(
               (t) =>
-          t.phase == TaskPhase.TpUpRunning ||
-              t.phase == TaskPhase.TpUpQueued,
-        )
+                  t.phase == TaskPhase.TpUpRunning ||
+                  t.phase == TaskPhase.TpUpQueued,
+            )
             .toList();
         break;
       case FilterType.UL_completed:
@@ -95,7 +93,7 @@ class TaskProvider extends ChangeNotifier {
             .where((t) => t.phase == TaskPhase.TpUpFailed)
             .toList();
         break;
-      }
+    }
 
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
@@ -116,13 +114,11 @@ class TaskProvider extends ChangeNotifier {
   Future<void> fetchTasks() async {
     _isLoading = true;
     _error = null;
-    _currentPage = 1;
     notifyListeners();
 
     try {
-      final response = await listTasks(page: 1, count: _pageSize);
+      final response = await listTasks();
       _tasks = response.tasks;
-      _hasMore = response.hasMore;
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -132,37 +128,16 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadMore() async {
-    if (!_hasMore || _isLoadingMore) return;
-
-    _isLoadingMore = true;
-    notifyListeners();
-
-    try {
-      final nextPage = _currentPage + 1;
-      final response = await listTasks(page: nextPage, count: _pageSize);
-      _tasks.addAll(response.tasks);
-      _currentPage = nextPage;
-      _hasMore = response.hasMore;
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoadingMore = false;
-      notifyListeners();
-    }
-  }
-
   void _startRealtimeUpdates() {
     _streamSubscription?.cancel();
     _streamSubscription =
         Stream.periodic(
           const Duration(seconds: AppStyles.refreshIntervalSeconds),
-          (_) => listTasks(page: _currentPage, count: _pageSize),
+          (_) => listTasks(),
         ).listen(
           (futureResp) async {
             final resp = await futureResp;
             _tasks = resp.tasks;
-            _hasMore = resp.hasMore;
             notifyListeners();
           },
           onError: (e) {
@@ -247,13 +222,11 @@ class TaskProvider extends ChangeNotifier {
 
   void setFilter(FilterType filter) {
     _currentFilter = filter;
-    _currentPage = 1;
     fetchTasks();
   }
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    _currentPage = 1;
     fetchTasks();
   }
 
