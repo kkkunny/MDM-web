@@ -1,36 +1,21 @@
 import 'package:mdm/models/vo/task.pb.dart';
 
 extension TaskPhaseExtension on TaskPhase {
-  String get label {
-    switch (this) {
-      case TaskPhase.TpDownQueued:
-        return '等待下载';
-      case TaskPhase.TpDownRunning:
-        return '下载中';
-      case TaskPhase.TpDownPaused:
-        return '暂停下载';
-      case TaskPhase.TpDownFailed:
-        return '下载失败';
-      case TaskPhase.TpDownCompleted:
-        return '下载完成';
-      case TaskPhase.TpUpQueued:
-        return '等待上传';
-      case TaskPhase.TpUpRunning:
-        return '上传中';
-      case TaskPhase.TpUpPaused:
-        return '暂停上传';
-      case TaskPhase.TpUpFailed:
-        return '上传失败';
-      case TaskPhase.TpUpCompleted:
-        return '上传完成';
-      default:
-        return 'Unknown';
-    }
-  }
-}
+  String get label => switch (this) {
+    TaskPhase.TpDownQueued => '等待下载',
+    TaskPhase.TpDownRunning => '下载中',
+    TaskPhase.TpDownPaused => '暂停下载',
+    TaskPhase.TpDownFailed => '下载失败',
+    TaskPhase.TpDownCompleted => '下载完成',
+    TaskPhase.TpUpQueued => '等待上传',
+    TaskPhase.TpUpRunning => '上传中',
+    TaskPhase.TpUpPaused => '暂停上传',
+    TaskPhase.TpUpFailed => '上传失败',
+    TaskPhase.TpUpCompleted => '上传完成',
+    _ => 'Unknown',
+  };
 
-extension TaskExtension on Task {
-
+  bool get isDownload => name.startsWith('TpDown');
 }
 
 class DownloadStats {
@@ -54,18 +39,16 @@ class DownloadStats {
     required this.totalSize,
   });
 
-  factory DownloadStats.fromTasks(List<Task> tasks) {
-    return DownloadStats(
-      totalTasks: tasks.length,
-      downloading: tasks.where((t) => t.phase == TaskPhase.TpDownRunning).length,
-      completed: tasks.where((t) => t.phase == TaskPhase.TpDownCompleted).length,
-      paused: tasks.where((t) => t.phase == TaskPhase.TpDownQueued).length,
-      failed: tasks.where((t) => t.phase == TaskPhase.TpDownFailed).length,
-      totalSpeed: tasks
-          .where((t) => t.phase == TaskPhase.TpDownRunning)
-          .fold(0, (sum, t) => sum + t.downloadStats.speed.toInt()),
-      totalDownloaded: tasks.fold(0, (sum, t) => sum + t.downloadStats.size.toInt()),
-      totalSize: tasks.fold(0, (sum, t) => sum + t.size.toInt()),
-    );
-  }
+  factory DownloadStats.fromTasks(List<Task> tasks) => DownloadStats(
+    totalTasks: tasks.length,
+    downloading: tasks.where((t) => t.phase == TaskPhase.TpDownRunning).length,
+    completed: tasks.where((t) => t.phase == TaskPhase.TpDownCompleted).length,
+    paused: tasks.where((t) => t.phase == TaskPhase.TpDownQueued).length,
+    failed: tasks.where((t) => t.phase == TaskPhase.TpDownFailed).length,
+    totalSpeed: tasks
+        .where((t) => t.phase == TaskPhase.TpDownRunning)
+        .fold(0, (sum, t) => sum + t.downloadStats.speed.toInt()),
+    totalDownloaded: tasks.fold(0, (sum, t) => sum + t.downloadStats.size.toInt()),
+    totalSize: tasks.fold(0, (sum, t) => sum + t.size.toInt()),
+  );
 }

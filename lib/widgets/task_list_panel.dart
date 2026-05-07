@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mdm/apis/mdm/task.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
-import 'package:mdm/constants/strings.dart';
+import 'package:mdm/configs/theme.dart';
 import 'package:mdm/models/vo/task.pb.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/widgets/add_task_dialog.dart';
@@ -17,7 +15,7 @@ class TaskListPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.lightBackground,
+      color: kLightBackground,
       child: Column(
         children: [
           _buildToolbar(context),
@@ -31,26 +29,22 @@ class TaskListPanel extends StatelessWidget {
     return Consumer<TaskProvider>(
       builder: (context, provider, _) {
         return Container(
-          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
-          decoration: BoxDecoration(
-            color: AppColors.lightSurface,
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.lightDivider,
-              ),
-            ),
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: kLightSurface,
+            border: Border(bottom: BorderSide(color: kLightDivider)),
           ),
           child: Column(
             children: [
               Row(
                 children: [
                   Expanded(child: _buildSearchBar(context, provider)),
-                  const SizedBox(width: AppStyles.paddingLarge),
+                  const SizedBox(width: 16),
                   _buildAddButton(context),
                 ],
               ),
               if (provider.hasSelection) ...[
-                const SizedBox(height: AppStyles.paddingLarge),
+                const SizedBox(height: 16),
                 _buildSelectionToolbar(context, provider),
               ],
             ],
@@ -60,36 +54,23 @@ class TaskListPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(
-    BuildContext context,
-    TaskProvider provider,
-  ) {
+  Widget _buildSearchBar(BuildContext context, TaskProvider provider) {
     return Container(
-      height: AppStyles.inputHeight,
+      height: 48,
       decoration: BoxDecoration(
-        color: AppColors.lightSurfaceLight,
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-        border: Border.all(
-          color: AppColors.lightDivider,
-        ),
+        color: kLightSurfaceLight,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kLightDivider),
       ),
       child: TextField(
         onChanged: provider.setSearchQuery,
-        style: TextStyle(color: AppColors.lightText),
+        style: const TextStyle(color: kLightText),
         decoration: InputDecoration(
-          hintText: AppStrings.searchDownloads,
-          hintStyle: TextStyle(
-            color: AppColors.lightTextSecondary,
-          ),
-          prefixIcon: Icon(
-            Icons.search_rounded,
-            color: AppColors.lightTextSecondary,
-          ),
+          hintText: '搜索任务...',
+          hintStyle: TextStyle(color: kLightTextSecondary),
+          prefixIcon: Icon(Icons.search_rounded, color: kLightTextSecondary),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppStyles.paddingLarge,
-            vertical: 14,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -103,55 +84,44 @@ class TaskListPanel extends StatelessWidget {
         context: context,
         builder: (context) => AddTaskDialog(
           action: (AddTaskData data) async {
-            await createTask(
-              CreateTaskRequest(link: data.link, name: data.taskName),
-            );
+            await createTask(CreateTaskRequest(link: data.link, name: data.taskName));
           },
         ),
       ),
     );
   }
 
-  Widget _buildSelectionToolbar(
-    BuildContext context,
-    TaskProvider provider,
-  ) {
+  Widget _buildSelectionToolbar(BuildContext context, TaskProvider provider) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.paddingLarge,
-        vertical: AppStyles.paddingMedium,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        color: kPrimary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: kPrimary.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Text(
-            '${provider.selectedTaskIds.length} ${AppStrings.selected}',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
+            '${provider.selectedTaskIds.length} 已选择',
+            style: const TextStyle(color: kPrimary, fontWeight: FontWeight.w600),
           ),
           const Spacer(),
           _buildToolbarButton(
             icon: Icons.pause_rounded,
-            label: AppStrings.pauseAll,
-            onTap: () => provider.pauseSelected(),
+            label: '全部暂停',
+            onTap: () {},
           ),
-          const SizedBox(width: AppStyles.paddingMedium),
+          const SizedBox(width: 12),
           _buildToolbarButton(
             icon: Icons.delete_rounded,
-            label: AppStrings.delete,
-            color: AppColors.error,
+            label: '删除',
+            color: kError,
             onTap: () => _showDeleteConfirmDialog(context, provider),
           ),
-          const SizedBox(width: AppStyles.paddingMedium),
+          const SizedBox(width: 12),
           _buildToolbarButton(
             icon: Icons.close_rounded,
-            label: AppStrings.cancel,
+            label: '取消',
             onTap: () => provider.clearSelection(),
           ),
         ],
@@ -163,7 +133,7 @@ class TaskListPanel extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
-    Color color = AppColors.white70,
+    Color color = Colors.white70,
   }) {
     return Material(
       color: Colors.transparent,
@@ -171,10 +141,7 @@ class TaskListPanel extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppStyles.paddingMedium,
-            vertical: AppStyles.paddingSmall,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: [
               Icon(icon, color: color, size: 18),
@@ -191,9 +158,7 @@ class TaskListPanel extends StatelessWidget {
     return Consumer<TaskProvider>(
       builder: (context, provider, _) {
         if (provider.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
+          return const Center(child: CircularProgressIndicator(color: kPrimary));
         }
 
         if (provider.error != null) {
@@ -201,23 +166,13 @@ class TaskListPanel extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 64,
-                  color: AppColors.white30,
-                ),
-                const SizedBox(height: AppStyles.paddingLarge),
-                Text(
-                  AppStrings.failedToLoadTasks,
-                  style: TextStyle(
-                    color: AppColors.white50,
-                    fontSize: AppStyles.fontSizeLarge,
-                  ),
-                ),
-                const SizedBox(height: AppStyles.spacingSmall),
+                Icon(Icons.error_outline_rounded, size: 64, color: Colors.black12),
+                const SizedBox(height: 16),
+                Text('加载任务失败', style: TextStyle(color: Colors.black38, fontSize: 16)),
+                const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => provider.fetchTasks(),
-                  child: const Text(AppStrings.retry),
+                  child: const Text('重试'),
                 ),
               ],
             ),
@@ -229,42 +184,23 @@ class TaskListPanel extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.download_done_rounded,
-                  size: 80,
-                  color: AppColors.white30,
-                ),
-                const SizedBox(height: AppStyles.paddingXLarge),
-                Text(
-                  AppStrings.noDownloadsYet,
-                  style: TextStyle(
-                    color: AppColors.white50,
-                    fontSize: AppStyles.fontSizeXLarge,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: AppStyles.spacingSmall),
-                Text(
-                  AppStrings.clickAddTask,
-                  style: TextStyle(
-                    color: AppColors.white30,
-                    fontSize: AppStyles.fontSizeMedium,
-                  ),
-                ),
+                Icon(Icons.download_done_rounded, size: 80, color: Colors.black12),
+                const SizedBox(height: 20),
+                Text('暂无任务', style: TextStyle(color: Colors.black38, fontSize: 18, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 8),
+                Text('点击"添加任务"开始下载', style: TextStyle(color: Colors.black26, fontSize: 14)),
               ],
             ),
           );
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+          padding: const EdgeInsets.all(20),
           itemCount: provider.tasks.length,
           itemBuilder: (context, index) {
             final task = provider.tasks[index];
             return Padding(
-              padding: const EdgeInsets.only(
-                bottom: AppStyles.paddingMedium,
-              ),
+              padding: const EdgeInsets.only(bottom: 12),
               child: TaskCard(
                 task: task,
                 isSelected: provider.selectedTaskIds.contains(task.id),
@@ -280,18 +216,13 @@ class TaskListPanel extends StatelessWidget {
   void _showDeleteConfirmDialog(BuildContext context, TaskProvider provider) {
     AppDialog.showConfirmDialog(
       context,
-      title: AppStrings.deleteDownloads,
-      content: AppStrings.deleteConfirm.replaceAll(
-        '{}',
-        provider.selectedTaskIds.length.toString(),
-      ),
-      confirmText: AppStrings.delete,
-      cancelText: AppStrings.cancel,
-      confirmColor: AppColors.error,
+      title: '删除下载？',
+      content: '确定要删除 ${provider.selectedTaskIds.length} 个选中的下载吗？',
+      confirmText: '删除',
+      cancelText: '取消',
+      confirmColor: kError,
     ).then((confirmed) {
-      if (confirmed == true) {
-        provider.deleteSelected();
-      }
+      if (confirmed == true) provider.deleteSelected();
     });
   }
 }

@@ -1,7 +1,6 @@
 import 'package:mdm/configs/api.dart';
 import 'package:mdm/apis/mdm/client.dart';
 import 'package:mdm/models/vo/task.pb.dart';
-import 'package:mdm/providers/task_provider.dart';
 
 Future<ListTasksResponse> listTasks() async {
   final data = await request(

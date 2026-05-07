@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
+import 'package:mdm/configs/theme.dart';
 
 class AppButton extends StatelessWidget {
   final String text;
@@ -32,17 +31,15 @@ class AppButton extends StatelessWidget {
     IconData? icon,
     bool isLoading = false,
     double? width,
-  }) {
-    return AppButton(
-      text: text,
-      onPressed: onPressed,
-      backgroundColor: AppColors.primary,
-      textColor: AppColors.white,
-      icon: icon,
-      isLoading: isLoading,
-      width: width,
-    );
-  }
+  }) => AppButton(
+    text: text,
+    onPressed: onPressed,
+    backgroundColor: kPrimary,
+    textColor: Colors.white,
+    icon: icon,
+    isLoading: isLoading,
+    width: width,
+  );
 
   factory AppButton.danger({
     required String text,
@@ -50,17 +47,15 @@ class AppButton extends StatelessWidget {
     IconData? icon,
     bool isLoading = false,
     double? width,
-  }) {
-    return AppButton(
-      text: text,
-      onPressed: onPressed,
-      backgroundColor: AppColors.error,
-      textColor: AppColors.white,
-      icon: icon,
-      isLoading: isLoading,
-      width: width,
-    );
-  }
+  }) => AppButton(
+    text: text,
+    onPressed: onPressed,
+    backgroundColor: kError,
+    textColor: Colors.white,
+    icon: icon,
+    isLoading: isLoading,
+    width: width,
+  );
 
   factory AppButton.outlined({
     required String text,
@@ -68,57 +63,44 @@ class AppButton extends StatelessWidget {
     Color? color,
     IconData? icon,
     double? width,
-  }) {
-    return AppButton(
-      text: text,
-      onPressed: onPressed,
-      backgroundColor: Colors.transparent,
-      textColor: color ?? AppColors.white70,
-      icon: icon,
-      isOutlined: true,
-      width: width,
-    );
-  }
+  }) => AppButton(
+    text: text,
+    onPressed: onPressed,
+    backgroundColor: Colors.transparent,
+    textColor: color ?? Colors.white70,
+    icon: icon,
+    isOutlined: true,
+    width: width,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBackgroundColor = backgroundColor ?? AppColors.primary;
-    final effectiveTextColor = textColor ?? AppColors.white;
+    final bgColor = backgroundColor ?? kPrimary;
+    final txtColor = textColor ?? Colors.white;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: isLoading ? null : onPressed,
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           width: width,
-          height: height ?? AppStyles.buttonHeight,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppStyles.paddingLarge,
-          ),
+          height: height ?? 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             gradient: isOutlined
                 ? null
-                : LinearGradient(
-                    colors: [
-                      effectiveBackgroundColor,
-                      effectiveBackgroundColor.withValues(alpha: 0.8),
-                    ],
-                  ),
+                : LinearGradient(colors: [bgColor, bgColor.withValues(alpha: 0.8)]),
             color: isOutlined ? Colors.transparent : null,
-            borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
-            border: isOutlined
-                ? Border.all(color: effectiveTextColor.withValues(alpha: 0.3))
-                : null,
+            borderRadius: BorderRadius.circular(12),
+            border: isOutlined ? Border.all(color: txtColor.withValues(alpha: 0.3)) : null,
             boxShadow: isOutlined
                 ? null
-                : [
-                    BoxShadow(
-                      color: effectiveBackgroundColor.withValues(alpha: 0.4),
-                      blurRadius: AppStyles.blurRadiusSmall,
-                      offset: const Offset(0, AppStyles.shadowOffsetSmall),
-                    ),
-                  ],
+                : [BoxShadow(
+                    color: bgColor.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )],
           ),
           child: Center(
             child: isLoading
@@ -127,24 +109,17 @@ class AppButton extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(effectiveTextColor),
+                      valueColor: AlwaysStoppedAnimation(txtColor),
                     ),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, color: effectiveTextColor, size: 20),
-                        const SizedBox(width: AppStyles.spacingSmall),
+                        Icon(icon, color: txtColor, size: 20),
+                        const SizedBox(width: 8),
                       ],
-                      Text(
-                        text,
-                        style: TextStyle(
-                          color: effectiveTextColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Text(text, style: TextStyle(color: txtColor, fontWeight: FontWeight.w600)),
                     ],
                   ),
           ),

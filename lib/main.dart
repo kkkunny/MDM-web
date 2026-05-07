@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:mdm/providers/task_provider.dart';
-import 'package:mdm/providers/theme_provider.dart';
 import 'package:mdm/pages/overall_page.dart';
 import 'package:mdm/configs/theme.dart';
 
@@ -13,11 +12,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TaskProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ],
+    return ChangeNotifierProvider(
+      create: (_) => TaskProvider(),
       child: GetMaterialApp(
         title: 'Download Manager',
         debugShowCheckedModeBanner: false,

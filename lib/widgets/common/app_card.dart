@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
+import 'package:mdm/configs/theme.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -28,15 +27,15 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBackgroundColor = backgroundColor ?? AppColors.surface;
-    final effectiveBorderRadius = borderRadius ?? AppStyles.borderRadiusLarge;
+    final effectiveColor = backgroundColor ?? kLightSurface;
+    final effectiveRadius = borderRadius ?? 16;
 
     Widget cardChild = Container(
-      padding: padding ?? const EdgeInsets.all(AppStyles.paddingXLarge),
+      padding: padding ?? const EdgeInsets.all(20),
       margin: margin,
       decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
-        borderRadius: BorderRadius.circular(effectiveBorderRadius),
+        color: effectiveColor,
+        borderRadius: BorderRadius.circular(effectiveRadius),
         border: border,
         boxShadow: boxShadow,
       ),
@@ -50,7 +49,7 @@ class AppCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(effectiveBorderRadius),
+          borderRadius: BorderRadius.circular(effectiveRadius),
           child: cardChild,
         ),
       );
@@ -70,23 +69,15 @@ class _HoverableCard extends StatefulWidget {
   State<_HoverableCard> createState() => _HoverableCardState();
 }
 
-class _HoverableCardState extends State<_HoverableCard>
-    with SingleTickerProviderStateMixin {
+class _HoverableCardState extends State<_HoverableCard> with SingleTickerProviderStateMixin {
   bool _isHovered = false;
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: AppStyles.animationDurationShort,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _controller, curve: AppStyles.animationCurve),
-    );
-  }
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 150),
+    vsync: this,
+  );
+  late final Animation<double> _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
+    CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+  );
 
   @override
   void dispose() {
@@ -113,25 +104,20 @@ class _HoverableCardState extends State<_HoverableCard>
             child: GestureDetector(
               onTap: widget.onTap,
               child: AnimatedContainer(
-                duration: AppStyles.animationDurationMedium,
+                duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: _isHovered
-                        ? AppColors.white.withValues(alpha: 0.2)
-                        : AppColors.white.withValues(alpha: 0.05),
-                    width: AppStyles.borderWidthThin,
+                        ? kPrimary.withValues(alpha: 0.2)
+                        : kPrimary.withValues(alpha: 0.05),
+                    width: 1,
                   ),
                   boxShadow: _isHovered
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            blurRadius: AppStyles.blurRadiusMedium,
-                            offset: const Offset(
-                              0,
-                              AppStyles.shadowOffsetMedium,
-                            ),
-                          ),
-                        ]
+                      ? [BoxShadow(
+                          color: kPrimary.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )]
                       : null,
                 ),
                 child: widget.child,

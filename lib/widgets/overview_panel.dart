@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
-import 'package:mdm/constants/strings.dart';
-import 'package:mdm/icons/iconfont.dart';
+import 'package:mdm/configs/theme.dart';
 import 'package:mdm/providers/task_provider.dart';
 import 'package:mdm/utils/color_helper.dart';
 import 'package:mdm/utils/format_helper.dart';
@@ -16,7 +13,6 @@ class OverviewPanel extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSpeedCard(context),
@@ -34,11 +30,11 @@ class OverviewPanel extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: ColorHelper.getPrimaryGradient(),
+            gradient: getPrimaryGradient(),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: kPrimary.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -50,20 +46,11 @@ class OverviewPanel extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '下载速度',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
+                  const Text('下载速度', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -72,79 +59,50 @@ class OverviewPanel extends StatelessWidget {
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: stats.downloading > 0
-                                ? AppColors.success
-                                : AppColors.white54,
+                            color: stats.downloading > 0 ? kSuccess : Colors.white54,
                             shape: BoxShape.circle,
                           ),
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          stats.downloading > 0
-                              ? '已连接'
-                              : '已断联',
-                          style: const TextStyle(
-                            color: AppColors.white,
-                            fontSize: 12,
-                          ),
+                          stats.downloading > 0 ? '已连接' : '已断联',
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppStyles.spacingLarge),
+              const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     FormatHelper.formatSpeed(stats.totalSpeed.toDouble()),
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
                   ),
                   const Padding(
                     padding: EdgeInsets.only(bottom: 6, left: 4),
-                    child: Text(
-                      AppStrings.perSecond,
-                      style: TextStyle(
-                        color: AppColors.white70,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: Text('/s', style: TextStyle(color: Colors.white70, fontSize: 16)),
                   ),
                 ],
               ),
-              const SizedBox(height: AppStyles.spacingLarge),
+              const SizedBox(height: 16),
               LinearProgressIndicator(
                 minHeight: 6,
                 borderRadius: BorderRadius.circular(8),
-                value: stats.totalSize > 0
-                    ? stats.totalDownloaded / stats.totalSize
-                    : 0.0,
-                backgroundColor: AppColors.white.withValues(alpha: 0.2),
-                valueColor: AlwaysStoppedAnimation(AppColors.white),
+                value: stats.totalSize > 0 ? stats.totalDownloaded / stats.totalSize : 0.0,
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
+                valueColor: const AlwaysStoppedAnimation(Colors.white),
               ),
               const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    FormatHelper.formatSize(stats.totalDownloaded),
-                    style: TextStyle(
-                      color: AppColors.white60,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    FormatHelper.formatSize(stats.totalSize),
-                    style: TextStyle(
-                      color: AppColors.white60,
-                      fontSize: 12,
-                    ),
-                  ),
+                  Text(FormatHelper.formatSize(stats.totalDownloaded),
+                      style: TextStyle(color: Colors.white60, fontSize: 12)),
+                  Text(FormatHelper.formatSize(stats.totalSize),
+                      style: TextStyle(color: Colors.white60, fontSize: 12)),
                 ],
               ),
             ],
@@ -162,20 +120,20 @@ class OverviewPanel extends StatelessWidget {
           children: [
             ExpansionTile(
               initiallyExpanded: true,
-              leading: Icon(Icons.download_rounded),
-              title: Text('下载任务'),
-              children: FilterType.values.getRange(0, 4).map(
-                    (filter) => _buildFilterItem(context, filter, provider),
-              ).toList(),
+              leading: const Icon(Icons.download_rounded),
+              title: const Text('下载任务'),
+              children: FilterType.values.getRange(0, 4)
+                  .map((filter) => _buildFilterItem(context, filter, provider))
+                  .toList(),
             ),
             const SizedBox(height: 12),
             ExpansionTile(
               initiallyExpanded: true,
-              leading: Icon(Icons.upload_rounded),
-              title: Text('上传任务'),
-              children: FilterType.values.skip(4).map(
-                    (filter) => _buildFilterItem(context, filter, provider),
-              ).toList(),
+              leading: const Icon(Icons.upload_rounded),
+              title: const Text('上传任务'),
+              children: FilterType.values.skip(4)
+                  .map((filter) => _buildFilterItem(context, filter, provider))
+                  .toList(),
             ),
           ],
         );
@@ -183,79 +141,57 @@ class OverviewPanel extends StatelessWidget {
     );
   }
 
-  static Icon getFilterIcon(FilterType filter) {
-    switch (filter) {
-      case FilterType.DL_running:
-        return const Icon(Icons.download_for_offline_rounded, color: AppColors.info, size: 20);
-      case FilterType.DL_completed:
-        return const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20);
-      case FilterType.DL_paused:
-        return const Icon(Icons.pause_circle_rounded, color: AppColors.warning, size: 20);
-      case FilterType.DL_failed:
-        return const Icon(Icons.pause_circle_rounded, color: AppColors.error, size: 20);
-      case FilterType.UL_running:
-        return const Icon(IconFont.upload, color: AppColors.info, size: 18);
-      case FilterType.UL_completed:
-        return const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 20);
-      case FilterType.UL_paused:
-        return const Icon(Icons.pause_circle_rounded, color: AppColors.warning, size: 20);
-      case FilterType.UL_failed:
-        return const Icon(Icons.pause_circle_rounded, color: AppColors.error, size: 20);
-    }
+  static const _filterIcons = {
+    FilterType.dlRunning: Icons.download_for_offline_rounded,
+    FilterType.dlCompleted: Icons.check_circle_rounded,
+    FilterType.dlPaused: Icons.pause_circle_rounded,
+    FilterType.dlFailed: Icons.pause_circle_rounded,
+    FilterType.ulRunning: Icons.upload,
+    FilterType.ulCompleted: Icons.check_circle_rounded,
+    FilterType.ulPaused: Icons.pause_circle_rounded,
+    FilterType.ulFailed: Icons.pause_circle_rounded,
+  };
+
+  static const _filterLabels = {
+    FilterType.dlRunning: '下载中',
+    FilterType.dlCompleted: '已完成',
+    FilterType.dlPaused: '暂停中',
+    FilterType.dlFailed: '已失败',
+    FilterType.ulRunning: '上传中',
+    FilterType.ulCompleted: '已完成',
+    FilterType.ulPaused: '暂停中',
+    FilterType.ulFailed: '已失败',
+  };
+
+  static Color _filterColor(FilterType filter) {
+    return switch (filter) {
+      FilterType.dlFailed || FilterType.ulFailed => kError,
+      FilterType.dlPaused || FilterType.ulPaused => kWarning,
+      FilterType.dlCompleted || FilterType.ulCompleted => kSuccess,
+      _ => kInfo,
+    };
   }
 
-  static String getFilterLabel(FilterType filter) {
-    switch (filter) {
-      case FilterType.DL_running:
-        return '下载中';
-      case FilterType.DL_completed:
-        return '已完成';
-      case FilterType.DL_paused:
-        return '暂停中';
-      case FilterType.DL_failed:
-        return '已失败';
-      case FilterType.UL_running:
-        return '上传中';
-      case FilterType.UL_completed:
-        return '已完成';
-      case FilterType.UL_paused:
-        return '暂停中';
-      case FilterType.UL_failed:
-        return '已失败';
-    }
-  }
-
-  Widget _buildFilterItem(
-    BuildContext context,
-    FilterType filter,
-    TaskProvider provider,
-  ) {
+  Widget _buildFilterItem(BuildContext context, FilterType filter, TaskProvider provider) {
     final isSelected = provider.currentFilter == filter;
-    final icon = getFilterIcon(filter);
-    final label = getFilterLabel(filter);
+    final color = _filterColor(filter);
+    final icon = Icon(_filterIcons[filter], color: color, size: 20);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppStyles.spacingSmall),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () => provider.setFilter(filter),
           borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
-            duration: AppStyles.animationDurationMedium,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppStyles.paddingLarge,
-              vertical: 12,
-            ),
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? icon.color!.withValues(alpha: 0.15)
-                  : Colors.transparent,
+              color: isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected
-                    ? icon.color!.withValues(alpha: 0.3)
-                    : Colors.transparent,
+                color: isSelected ? color.withValues(alpha: 0.3) : Colors.transparent,
               ),
             ),
             child: Row(
@@ -263,21 +199,14 @@ class OverviewPanel extends StatelessWidget {
                 icon,
                 const SizedBox(width: 12),
                 Text(
-                  label,
+                  _filterLabels[filter]!,
                   style: TextStyle(
-                    color: isSelected ? icon.color! : Colors.black54,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                    color: isSelected ? color : Colors.black54,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
                 const Spacer(),
-                if (isSelected)
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: icon.color!,
-                    size: 20,
-                  ),
+                if (isSelected) Icon(Icons.chevron_right_rounded, color: color, size: 20),
               ],
             ),
           ),

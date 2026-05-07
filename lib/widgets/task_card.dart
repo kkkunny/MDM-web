@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mdm/apis/mdm/task.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
+import 'package:mdm/configs/theme.dart';
 import 'package:mdm/models/task.dart';
 import 'package:mdm/models/vo/task.pb.dart';
 import 'package:mdm/utils/color_helper.dart';
@@ -13,34 +12,21 @@ class TaskCard extends StatefulWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const TaskCard({
-    super.key,
-    required this.task,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const TaskCard({super.key, required this.task, required this.isSelected, required this.onTap});
 
   @override
   State<TaskCard> createState() => _TaskCardState();
 }
 
-class _TaskCardState extends State<TaskCard>
-    with SingleTickerProviderStateMixin {
+class _TaskCardState extends State<TaskCard> with SingleTickerProviderStateMixin {
   bool _isHovered = false;
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: AppStyles.animationDurationShort,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _controller, curve: AppStyles.animationCurve),
-    );
-  }
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 150),
+    vsync: this,
+  );
+  late final Animation<double> _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
+    CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+  );
 
   @override
   void dispose() {
@@ -48,9 +34,13 @@ class _TaskCardState extends State<TaskCard>
     super.dispose();
   }
 
+  void _operate(Operate op) {
+    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: op));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final statusColor = ColorHelper.getStatusColor(widget.task.phase);
+    final statusColor = getStatusColor(widget.task.phase);
 
     return MouseRegion(
       onEnter: (_) {
@@ -69,52 +59,39 @@ class _TaskCardState extends State<TaskCard>
             child: GestureDetector(
               onTap: widget.onTap,
               child: AnimatedContainer(
-                duration: AppStyles.animationDurationMedium,
-                padding: const EdgeInsets.all(AppStyles.paddingXLarge),
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: widget.isSelected
-                      ? LinearGradient(
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.2),
-                            AppColors.primaryDark.withValues(alpha: 0.1),
-                          ],
-                        )
+                      ? LinearGradient(colors: [
+                          kPrimary.withValues(alpha: 0.2),
+                          kPrimaryDark.withValues(alpha: 0.1),
+                        ])
                       : null,
-                  color: widget.isSelected
-                      ? null
-                      : AppColors.lightSurface,
-                  borderRadius: BorderRadius.circular(
-                    AppStyles.borderRadiusLarge,
-                  ),
+                  color: widget.isSelected ? null : kLightSurface,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: widget.isSelected
-                        ? AppColors.primary.withValues(alpha: 0.5)
+                        ? kPrimary.withValues(alpha: 0.5)
                         : _isHovered
-                        ? AppColors.lightDivider
-                        : AppColors.lightDivider,
-                    width: widget.isSelected
-                        ? AppStyles.borderWidthMedium
-                        : AppStyles.borderWidthThin,
+                            ? kLightDivider.withValues(alpha: 0.8)
+                            : kLightDivider,
+                    width: widget.isSelected ? 2 : 1,
                   ),
                   boxShadow: _isHovered
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            blurRadius: AppStyles.blurRadiusMedium,
-                            offset: const Offset(
-                              0,
-                              AppStyles.shadowOffsetMedium,
-                            ),
-                          ),
-                        ]
+                      ? [BoxShadow(
+                          color: kPrimary.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        )]
                       : null,
                 ),
                 child: Column(
                   children: [
                     _buildHeader(statusColor),
-                    const SizedBox(height: AppStyles.spacingLarge),
+                    const SizedBox(height: 16),
                     _buildProgressSection(statusColor),
-                    const SizedBox(height: AppStyles.spacingLarge),
+                    const SizedBox(height: 16),
                     _buildFooter(statusColor),
                   ],
                 ),
@@ -130,18 +107,14 @@ class _TaskCardState extends State<TaskCard>
     return Row(
       children: [
         _buildFileIcon(statusColor),
-        const SizedBox(width: AppStyles.spacingLarge),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 widget.task.name,
-                style: TextStyle(
-                  color: AppColors.lightText,
-                  fontSize: AppStyles.fontSizeLarge,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(color: kLightText, fontSize: 16, fontWeight: FontWeight.w600),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -150,8 +123,7 @@ class _TaskCardState extends State<TaskCard>
                 children: [
                   _buildStatusBadge(statusColor),
                   const SizedBox(width: 8),
-                  if (widget.task.category.name.isNotEmpty)
-                    _buildCategoryBadge(),
+                  if (widget.task.category.name.isNotEmpty) _buildCategoryBadge(),
                 ],
               ),
             ],
@@ -163,33 +135,30 @@ class _TaskCardState extends State<TaskCard>
   }
 
   Widget _buildFileIcon(Color statusColor) {
-    final iconData = IconHelper.getFileIcon(widget.task.name);
-
     return Container(
       width: 48,
       height: 48,
       decoration: BoxDecoration(
         color: statusColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusMedium),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Icon(iconData, color: statusColor, size: AppStyles.iconSizeLarge),
+      child: Icon(IconHelper.getFileIcon(widget.task.name), color: statusColor, size: 24),
     );
   }
 
   Widget _buildStatusBadge(Color statusColor) {
+    final isRunning = widget.task.phase == TaskPhase.TpDownRunning;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: ColorHelper.getStatusBackgroundColor(widget.task.phase),
+        color: getStatusBackgroundColor(widget.task.phase),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: ColorHelper.getStatusBorderColor(widget.task.phase),
-        ),
+        border: Border.all(color: getStatusBorderColor(widget.task.phase)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.task.phase == TaskPhase.TpDownRunning)
+          if (isRunning)
             SizedBox(
               width: 12,
               height: 12,
@@ -202,19 +171,12 @@ class _TaskCardState extends State<TaskCard>
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                color: statusColor,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
             ),
           const SizedBox(width: 6),
           Text(
             widget.task.phase.label,
-            style: TextStyle(
-              color: statusColor,
-              fontSize: AppStyles.fontSizeSmall,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -225,66 +187,28 @@ class _TaskCardState extends State<TaskCard>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.lightSurfaceLight,
+        color: kLightSurfaceLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         widget.task.category.name,
-        style: TextStyle(
-          color: AppColors.lightTextSecondary,
-          fontSize: AppStyles.fontSizeSmall,
-        ),
+        style: const TextStyle(color: kLightTextSecondary, fontSize: 12),
       ),
     );
   }
 
-  void _onPause(){
-    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpPause));
-  }
-
-  void _onResume(){
-    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpResume));
-  }
-
-  void _onDelete(){
-    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpDelete));
-  }
-
-  void _onRetry(){
-    operateTasks(OperateTasksRequest(ids: [widget.task.id], operate: Operate.OpRetry));
-  }
-
   Widget _buildActionButtons(Color statusColor) {
+    final phase = widget.task.phase;
     return Row(
       children: [
-        if (widget.task.phase == TaskPhase.TpDownQueued || widget.task.phase == TaskPhase.TpDownRunning)
-          _buildIconButton(
-            icon: Icons.pause_rounded,
-            color: AppColors.warning,
-            onPressed: _onPause,
-            tooltip: 'Pause',
-          ),
-        if (widget.task.phase == TaskPhase.TpDownPaused)
-          _buildIconButton(
-            icon: Icons.play_arrow_rounded,
-            color: AppColors.info,
-            onPressed: _onResume,
-            tooltip: 'Resume',
-          ),
-        if (widget.task.phase == TaskPhase.TpDownFailed)
-          _buildIconButton(
-            icon: Icons.refresh_rounded,
-            color: AppColors.primary,
-            onPressed: _onRetry,
-            tooltip: 'Retry',
-          ),
+        if (phase == TaskPhase.TpDownQueued || phase == TaskPhase.TpDownRunning)
+          _buildIconButton(icon: Icons.pause_rounded, color: kWarning, onPressed: () => _operate(Operate.OpPause)),
+        if (phase == TaskPhase.TpDownPaused)
+          _buildIconButton(icon: Icons.play_arrow_rounded, color: kInfo, onPressed: () => _operate(Operate.OpResume)),
+        if (phase == TaskPhase.TpDownFailed)
+          _buildIconButton(icon: Icons.refresh_rounded, color: kPrimary, onPressed: () => _operate(Operate.OpRetry)),
         const SizedBox(width: 8),
-        _buildIconButton(
-          icon: Icons.delete_outline_rounded,
-          color: AppColors.error,
-          onPressed: _onDelete,
-          tooltip: 'Delete',
-        ),
+        _buildIconButton(icon: Icons.delete_outline_rounded, color: kError, onPressed: () => _operate(Operate.OpDelete)),
       ],
     );
   }
@@ -293,10 +217,12 @@ class _TaskCardState extends State<TaskCard>
     required IconData icon,
     required Color color,
     required VoidCallback onPressed,
-    required String tooltip,
   }) {
     return Tooltip(
-      message: tooltip,
+      message: icon == Icons.pause_rounded ? '暂停'
+          : icon == Icons.play_arrow_rounded ? '继续'
+          : icon == Icons.refresh_rounded ? '重试'
+          : '删除',
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -317,39 +243,32 @@ class _TaskCardState extends State<TaskCard>
   }
 
   Widget _buildProgressSection(Color statusColor) {
-    final progress = widget.task.downloadStats.size;
+    final downloaded = widget.task.downloadStats.size;
     final total = widget.task.size;
+    final progressValue = total > 0 ? downloaded.toDouble() / total.toDouble() : 0.0;
 
     return Column(
       children: [
         LinearProgressIndicator(
           minHeight: 8,
           borderRadius: BorderRadius.circular(6),
-          value: progress.toDouble() / total.toDouble(),
-          backgroundColor: AppColors.lightDivider,
-          valueColor: widget.task.phase == TaskPhase.TpDownRunning ? AlwaysStoppedAnimation(AppColors.info): AlwaysStoppedAnimation(statusColor),
+          value: progressValue,
+          backgroundColor: kLightDivider,
+          valueColor: AlwaysStoppedAnimation(
+            widget.task.phase == TaskPhase.TpDownRunning ? kInfo : statusColor,
+          ),
         ),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              FormatHelper.formatProgress(
-                progress.toDouble(),
-                total.toDouble(),
-              ),
-              style: TextStyle(
-                color: statusColor,
-                fontSize: AppStyles.fontSizeMedium,
-                fontWeight: FontWeight.w600,
-              ),
+              FormatHelper.formatProgress(downloaded.toDouble(), total.toDouble()),
+              style: TextStyle(color: statusColor, fontSize: 14, fontWeight: FontWeight.w600),
             ),
             Text(
-              '${FormatHelper.formatSize(progress.toInt())} / ${FormatHelper.formatSize(total.toInt())}',
-              style: TextStyle(
-                color: AppColors.lightTextSecondary,
-                fontSize: 13,
-              ),
+              '${FormatHelper.formatSize(downloaded.toInt())} / ${FormatHelper.formatSize(total.toInt())}',
+              style: const TextStyle(color: kLightTextSecondary, fontSize: 13),
             ),
           ],
         ),
@@ -361,54 +280,32 @@ class _TaskCardState extends State<TaskCard>
     return Row(
       children: [
         if (widget.task.phase == TaskPhase.TpDownRunning) ...[
-          Icon(
-            Icons.speed_rounded,
-            color: AppColors.lightTextSecondary,
-            size: AppStyles.iconSizeSmall,
-          ),
+          Icon(Icons.speed_rounded, color: kLightTextSecondary, size: 16),
           const SizedBox(width: 6),
           Text(
             '${FormatHelper.formatSpeed(widget.task.downloadStats.speed.toDouble())}/s',
-            style: TextStyle(
-              color: AppColors.lightTextSecondary,
-              fontSize: 13,
-            ),
+            style: const TextStyle(color: kLightTextSecondary, fontSize: 13),
           ),
           const SizedBox(width: 16),
-          Icon(
-            Icons.timer_outlined,
-            color: AppColors.lightTextSecondary,
-            size: AppStyles.iconSizeSmall,
-          ),
+          Icon(Icons.timer_outlined, color: kLightTextSecondary, size: 16),
           const SizedBox(width: 6),
           Text(
             FormatHelper.formatDuration(
-              widget.task.downloadStats.speed == 0 ? Duration.zero :
-                Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.size.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
+              widget.task.downloadStats.speed == 0
+                  ? Duration.zero
+                  : Duration(seconds: ((widget.task.size.toDouble() - widget.task.downloadStats.size.toDouble()) / widget.task.downloadStats.speed.toDouble()).toInt()),
             ),
-            style: TextStyle(
-              color: AppColors.lightTextSecondary,
-              fontSize: 13,
-            ),
+            style: const TextStyle(color: kLightTextSecondary, fontSize: 13),
           ),
         ],
         const Spacer(),
-        Icon(
-          Icons.access_time_rounded,
-          color: AppColors.lightTextSecondary,
-          size: 14,
-        ),
+        Icon(Icons.access_time_rounded, color: kLightTextSecondary, size: 14),
         const SizedBox(width: 4),
         Text(
           FormatHelper.formatDateTime(
-            DateTime.fromMillisecondsSinceEpoch(
-              widget.task.createdAt.toInt() * 1000,
-            ),
+            DateTime.fromMillisecondsSinceEpoch(widget.task.createdAt.toInt() * 1000),
           ),
-          style: TextStyle(
-            color: AppColors.lightTextSecondary,
-            fontSize: AppStyles.fontSizeSmall,
-          ),
+          style: const TextStyle(color: kLightTextSecondary, fontSize: 12),
         ),
       ],
     );

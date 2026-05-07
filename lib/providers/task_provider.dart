@@ -1,35 +1,43 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:mdm/apis/mdm/task.dart';
-import 'package:mdm/constants/styles.dart';
 import 'package:mdm/models/vo/task.pb.dart' hide DownloadStats;
-import '../models/task.dart';
-import '../services/download_service.dart';
+import 'package:mdm/models/task.dart';
 
 enum FilterType {
-  DL_running,
-  DL_completed,
-  DL_paused,
-  DL_failed,
-  UL_running,
-  UL_completed,
-  UL_paused,
-  UL_failed,
+  dlRunning,
+  dlCompleted,
+  dlPaused,
+  dlFailed,
+  ulRunning,
+  ulCompleted,
+  ulPaused,
+  ulFailed,
 }
 
-class TaskProvider extends ChangeNotifier {
-  final DownloadService _service;
+extension FilterTypeExtension on FilterType {
+  List<TaskPhase> get phases => switch (this) {
+    FilterType.dlRunning => [TaskPhase.TpDownRunning, TaskPhase.TpDownQueued],
+    FilterType.dlCompleted => [TaskPhase.TpDownCompleted],
+    FilterType.dlPaused => [TaskPhase.TpDownPaused],
+    FilterType.dlFailed => [TaskPhase.TpDownFailed],
+    FilterType.ulRunning => [TaskPhase.TpUpRunning, TaskPhase.TpUpQueued],
+    FilterType.ulCompleted => [TaskPhase.TpUpCompleted],
+    FilterType.ulPaused => [TaskPhase.TpUpPaused],
+    FilterType.ulFailed => [TaskPhase.TpUpFailed],
+  };
+}
 
+const _refreshInterval = Duration(seconds: 5);
+
+class TaskProvider extends ChangeNotifier {
   List<Task> _tasks = [];
   bool _isLoading = false;
   String? _error;
-  FilterType _currentFilter = FilterType.DL_running;
+  FilterType _currentFilter = FilterType.dlRunning;
   String _searchQuery = '';
   Set<String> _selectedTaskIds = {};
-  StreamSubscription? _streamSubscription;
-
-  TaskProvider({DownloadService? service})
-    : _service = service ?? DownloadService();
+  StreamSubscription? _pollSubscription;
 
   List<Task> get tasks => _filteredTasks;
   bool get isLoading => _isLoading;
@@ -42,73 +50,18 @@ class TaskProvider extends ChangeNotifier {
   DownloadStats get stats => DownloadStats.fromTasks(_tasks);
 
   List<Task> get _filteredTasks {
-    var filtered = _tasks;
-
-    switch (_currentFilter) {
-      case FilterType.DL_running:
-        filtered = filtered
-            .where(
-              (t) =>
-                  t.phase == TaskPhase.TpDownRunning ||
-                  t.phase == TaskPhase.TpDownQueued,
-            )
-            .toList();
-        break;
-      case FilterType.DL_completed:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpDownCompleted)
-            .toList();
-        break;
-      case FilterType.DL_paused:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpDownPaused)
-            .toList();
-        break;
-      case FilterType.DL_failed:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpDownFailed)
-            .toList();
-        break;
-      case FilterType.UL_running:
-        filtered = filtered
-            .where(
-              (t) =>
-                  t.phase == TaskPhase.TpUpRunning ||
-                  t.phase == TaskPhase.TpUpQueued,
-            )
-            .toList();
-        break;
-      case FilterType.UL_completed:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpUpCompleted)
-            .toList();
-        break;
-      case FilterType.UL_paused:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpUpPaused)
-            .toList();
-        break;
-      case FilterType.UL_failed:
-        filtered = filtered
-            .where((t) => t.phase == TaskPhase.TpUpFailed)
-            .toList();
-        break;
-    }
-
+    var filtered = _tasks.where((t) => _currentFilter.phases.contains(t.phase)).toList();
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
-          .where(
-            (t) => t.name.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
+          .where((t) => t.name.toLowerCase().contains(_searchQuery.toLowerCase()))
           .toList();
     }
-
     return filtered;
   }
 
   Future<void> initialize() async {
     await fetchTasks();
-    _startRealtimeUpdates();
+    _startPolling();
   }
 
   Future<void> fetchTasks() async {
@@ -117,9 +70,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await listTasks();
-      _tasks = response.tasks;
-      _error = null;
+      _tasks = (await listTasks()).tasks;
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -128,93 +79,25 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  void _startRealtimeUpdates() {
-    _streamSubscription?.cancel();
-    _streamSubscription =
-        Stream.periodic(
-          const Duration(seconds: AppStyles.refreshIntervalSeconds),
-          (_) => listTasks(),
-        ).listen(
-          (futureResp) async {
-            final resp = await futureResp;
-            _tasks = resp.tasks;
-            notifyListeners();
-          },
-          onError: (e) {
-            _error = e.toString();
-            notifyListeners();
-          },
-        );
-  }
-
-  Future<void> addTask(String url, {String? fileName, String? category}) async {
-    try {
-      final task = await _service.addTask(
-        url: url,
-        fileName: fileName,
-        category: category,
-      );
-      _tasks.insert(0, task);
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> pauseTask(String taskId) async {
-    try {
-      await _service.pauseTask(taskId);
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> resumeTask(String taskId) async {
-    try {
-      await _service.resumeTask(taskId);
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> deleteTask(String taskId, {bool deleteFile = false}) async {
-    try {
-      await _service.deleteTask(taskId, deleteFile: deleteFile);
-      _tasks.removeWhere((t) => t.id == taskId);
-      _selectedTaskIds.remove(taskId);
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> retryTask(String taskId) async {
-    try {
-      await _service.retryTask(taskId);
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> pauseSelected() async {
-    await _service.batchOperation(
-      taskIds: _selectedTaskIds.toList(),
-      operation: 'pause',
+  void _startPolling() {
+    _pollSubscription?.cancel();
+    _pollSubscription = Stream.periodic(_refreshInterval, (_) => listTasks()).listen(
+      (futureResp) async {
+        _tasks = (await futureResp).tasks;
+        notifyListeners();
+      },
+      onError: (e) {
+        _error = e.toString();
+        notifyListeners();
+      },
     );
-    _selectedTaskIds.clear();
-    notifyListeners();
   }
 
   Future<void> deleteSelected({bool deleteFile = false}) async {
-    await _service.batchOperation(
-      taskIds: _selectedTaskIds.toList(),
-      operation: 'delete',
-    );
+    await operateTasks(OperateTasksRequest(
+      ids: _selectedTaskIds.toList(),
+      operate: Operate.OpDelete,
+    ));
     _tasks.removeWhere((t) => _selectedTaskIds.contains(t.id));
     _selectedTaskIds.clear();
     notifyListeners();
@@ -222,12 +105,12 @@ class TaskProvider extends ChangeNotifier {
 
   void setFilter(FilterType filter) {
     _currentFilter = filter;
-    fetchTasks();
+    notifyListeners();
   }
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    fetchTasks();
+    notifyListeners();
   }
 
   void toggleSelection(String taskId) {
@@ -255,8 +138,7 @@ class TaskProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _streamSubscription?.cancel();
-    _service.dispose();
+    _pollSubscription?.cancel();
     super.dispose();
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mdm/constants/colors.dart';
-import 'package:mdm/constants/styles.dart';
+import 'package:mdm/configs/theme.dart';
 
 class AppDialog extends StatelessWidget {
   final String title;
@@ -20,9 +19,9 @@ class AppDialog extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String content,
-    String confirmText = 'Confirm',
-    String cancelText = 'Cancel',
-    Color confirmColor = AppColors.primary,
+    String confirmText = '确认',
+    String cancelText = '取消',
+    Color confirmColor = kPrimary,
   }) {
     return showDialog<bool>(
       context: context,
@@ -32,17 +31,13 @@ class AppDialog extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(cancelText, style: TextStyle(color: AppColors.white70)),
+            child: Text(cancelText, style: TextStyle(color: kLightTextSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: confirmColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  AppStyles.borderRadiusMedium,
-                ),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(confirmText),
           ),
@@ -54,16 +49,11 @@ class AppDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppStyles.borderRadiusXLarge),
-      ),
-      title: Text(title, style: const TextStyle(color: AppColors.white)),
-      content:
-          customContent ??
-          (content != null
-              ? Text(content!, style: TextStyle(color: AppColors.white70))
-              : null),
+      backgroundColor: kLightSurface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text(title, style: const TextStyle(color: kLightText)),
+      content: customContent ??
+          (content != null ? Text(content!, style: TextStyle(color: kLightTextSecondary)) : null),
       actions: actions,
     );
   }
